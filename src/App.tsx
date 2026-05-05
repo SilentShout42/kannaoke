@@ -62,6 +62,8 @@ export default function App() {
   const pendingRef = useRef<Performance | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
+  const resultsRef = useRef<HTMLUListElement | null>(null);
+  const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     fetch('/performances.json')
@@ -186,7 +188,18 @@ export default function App() {
                 : ''}
             </span>
           </div>
-          <ul id="results" role="list">
+          <ul
+            id="results"
+            role="list"
+            ref={resultsRef}
+            onScroll={() => {
+              const el = resultsRef.current;
+              if (!el) return;
+              el.classList.add('is-scrolling');
+              if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
+              scrollTimerRef.current = setTimeout(() => el.classList.remove('is-scrolling'), 1000);
+            }}
+          >
             {sorted.length === 0 ? (
               <li className="no-results">No songs found</li>
             ) : (

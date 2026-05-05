@@ -76,24 +76,33 @@ header .subtitle {
   flex-shrink: 0;
 }
 
-#search {
+.search-bar input {
   flex: 1;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
   font-size: 1rem;
+  font-family: inherit;
   padding: 0.625rem 1rem;
   outline: none;
   transition: border-color 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
 }
 
-#search::placeholder {
+.search-bar input::placeholder {
   color: var(--text-faint);
 }
 
-#search:focus {
+.search-bar input:focus {
   border-color: var(--accent-dim);
+}
+
+.search-bar input::-webkit-search-cancel-button,
+.search-bar input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 .result-count {
@@ -129,7 +138,37 @@ main {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  overflow-y: overlay; /* overlay scrollbar so content stays flush with the divider */
   overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+#results:hover,
+#results.is-scrolling {
+  scrollbar-color: var(--border) transparent;
+}
+
+#results::-webkit-scrollbar {
+  width: 6px;
+}
+
+#results::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#results::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 3px;
+}
+
+#results:hover::-webkit-scrollbar-thumb,
+#results.is-scrolling::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+#results:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
 }
 
 .result-item {
