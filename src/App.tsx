@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
+import {
+  IconDice1Filled, IconDice2Filled, IconDice3Filled,
+  IconDice4Filled, IconDice5Filled, IconDice6Filled,
+} from '@tabler/icons-react';
+
+const DICE_ICONS = [
+  IconDice1Filled, IconDice2Filled, IconDice3Filled,
+  IconDice4Filled, IconDice5Filled, IconDice6Filled,
+];
 
 interface Performance {
   title: string;
@@ -64,6 +73,9 @@ export default function App() {
   const mainRef = useRef<HTMLElement | null>(null);
   const resultsRef = useRef<HTMLUListElement | null>(null);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [diceIndex, setDiceIndex] = useState(0);
+  const [rolling, setRolling] = useState(false);
+  const rollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     fetch('/performances.json')
@@ -161,6 +173,23 @@ export default function App() {
     }
   }
 
+  function rollDice() {
+    if (rolling || performances.length === 0) return;
+    setRolling(true);
+    let ticks = 0;
+    const total = 10;
+    rollIntervalRef.current = setInterval(() => {
+      setDiceIndex(Math.floor(Math.random() * 6));
+      ticks++;
+      if (ticks >= total) {
+        clearInterval(rollIntervalRef.current!);
+        const entry = performances[Math.floor(Math.random() * performances.length)];
+        selectEntry(entry);
+        setRolling(false);
+      }
+    }, 60);
+  }
+
   const sorted = query.trim()
     ? (fuseRef.current?.search(query).map(r => r.item) ?? [])
     : [...performances].sort((a, b) => a.title.localeCompare(b.title));
@@ -170,6 +199,14 @@ export default function App() {
       <header>
         <h1>Kannaoke</h1>
         <p className="subtitle">The Kanna Yanagi 🦆🔍 Karaoke Index</p>
+        <button
+          className={`dice-btn${rolling ? ' rolling' : ''}`}
+          onClick={rollDice}
+          aria-label="Play random song"
+          title="Play random song"
+        >
+          {(() => { const Icon = DICE_ICONS[diceIndex]; return <Icon size={28} />; })()}
+        </button>
       </header>
 
       <main ref={e => { mainRef.current = e; }}>
