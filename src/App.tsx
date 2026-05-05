@@ -185,7 +185,7 @@ export default function App() {
 
         const markedData = data.map(p => ({
           ...p,
-          membersOnly: p.videoTitle.includes("Member's Handcam Stream"),
+          membersOnly: p.membersOnly === true,
         }));
 
         if (cancelled) return;
@@ -200,7 +200,7 @@ export default function App() {
         const fallbackData = (await fallbackRes.json()) as Performance[];
         const markedFallbackData = fallbackData.map(p => ({
           ...p,
-          membersOnly: p.videoTitle.includes("Member's Handcam Stream"),
+          membersOnly: p.membersOnly === true,
         }));
         if (cancelled) return;
         fuseRef.current = new Fuse(markedFallbackData, fuseOptions);

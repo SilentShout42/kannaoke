@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "prepare:data": "node scripts/build-performances.mjs",
-    "prepare:data:watch": "node --watch --watch-path=public/performances.json scripts/build-performances.mjs",
+    "prepare:data:watch": "node scripts/watch-performances.mjs",
     "dev": "npm run prepare:data && (npm run prepare:data:watch & vite)",
     "build": "npm run prepare:data && tsc -b && vite build",
     "preview": "vite preview",

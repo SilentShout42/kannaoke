@@ -51,7 +51,12 @@ function normalizeEntry(entry, idx) {
     videoTitle: entry.videoTitle.trim(),
     videoDate: entry.videoDate,
     startTime: entry.startTime,
+    membersOnly: entry.membersOnly === true,
   };
+
+  if ('membersOnly' in entry && typeof entry.membersOnly !== 'boolean') {
+    fail(`Entry ${idx}: membersOnly must be a boolean when present`);
+  }
 
   if ('endTime' in entry && entry.endTime !== null) {
     if (!Number.isInteger(entry.endTime) || entry.endTime < normalized.startTime) {
@@ -76,6 +81,7 @@ function dedupeEntries(entries) {
       entry.artist,
       entry.videoTitle,
       entry.videoDate,
+      entry.membersOnly,
       entry.endTime ?? null,
     ]);
     if (seen.has(key)) {
