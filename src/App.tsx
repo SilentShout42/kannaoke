@@ -86,6 +86,7 @@ export default function App() {
           keys: ['title', 'artist', 'videoTitle'],
           threshold: 0.4,
           includeScore: true,
+          ignoreLocation: false,
         });
         const random = data[Math.floor(Math.random() * data.length)];
         const urlParams = new URLSearchParams(window.location.search);
