@@ -35,8 +35,11 @@
         <span class="now-playing-artist" id="now-playing-artist"></span>
         <span class="now-playing-stream" id="now-playing-stream"></span>
       </div>
-      <div class="yt-container" id="yt-container" hidden>
+      <div class="yt-container" id="yt-container">
         <div id="yt-player"></div>
+        <div class="yt-loading" id="yt-loading" hidden>
+          <div class="yt-spinner"></div>
+        </div>
       </div>
       <p class="player-placeholder" id="player-placeholder">
         Select a song to start playing
@@ -49,7 +52,6 @@
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
-  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="app.js"></script>
 </body>
 </html>
