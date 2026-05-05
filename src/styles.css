@@ -295,6 +295,7 @@ main {
   flex-shrink: 0;
 }
 
+.cover-indicator,
 .members-only-indicator {
   display: inline-flex;
   align-items: center;

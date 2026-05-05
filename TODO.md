@@ -2,7 +2,7 @@
 
 - [ ] Up-to-date karaoke timestamps data
 - [ ] Reporting method for incorrect or missing timestamps
-- [ ] Include official covers
+- [x] Include official covers
 - [x] URL param support and permalinking so you can link to specific searches
 - [ ] Different color schemes (at least light & dark mode support), preferably ones keyed to Kanna model palettes
 - [ ] Easter eggs? 🔍

@@ -3,7 +3,7 @@ import Fuse from 'fuse.js';
 import type { IFuseOptions } from 'fuse.js';
 import {
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
-  IconDice4Filled, IconDice5Filled, IconDice6Filled, IconLockSquareRoundedFilled, IconX,
+  IconDice4Filled, IconDice5Filled, IconDice6Filled, IconDiscFilled, IconLockSquareRoundedFilled, IconX,
 } from '@tabler/icons-react';
 
 const DICE_ICONS = [
@@ -420,6 +420,15 @@ export default function App() {
                     </div>
                   </div>
                   <div className="result-meta">
+                    {/cover/i.test(entry.videoTitle) && (
+                      <span
+                        className="cover-indicator"
+                        title="Cover song"
+                        aria-label="Cover song"
+                      >
+                        <IconDiscFilled size={24} />
+                      </span>
+                    )}
                     {entry.membersOnly && (
                       <span
                         className="members-only-indicator"
