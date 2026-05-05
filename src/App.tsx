@@ -19,6 +19,7 @@ interface Performance {
   videoDate: string;
   startTime: number;
   endTime: number | null;
+  membersOnly?: boolean;
 }
 
 declare global {
@@ -91,13 +92,23 @@ export default function App() {
     const initializeApp = (data: Performance[]) => {
       if (cancelled) return;
 
-      setPerformances(data);
-      const random = data[Math.floor(Math.random() * data.length)];
+      // Mark members-only videos
+      const markedData = data.map(p => ({
+        ...p,
+        membersOnly: p.videoTitle.includes("Member's Handcam Stream")
+      }));
+
+      setPerformances(markedData);
+      
+      // Filter to public videos only for initial selection
+      const publicVideos = markedData.filter(p => !p.membersOnly);
+      const random = publicVideos[Math.floor(Math.random() * publicVideos.length)];
+      
       const urlParams = new URLSearchParams(window.location.search);
       const vParam = urlParams.get('v');
       const tParam = urlParams.get('t');
       const matched = vParam && tParam
-        ? data
+        ? markedData
           .filter(p => p.videoId === vParam)
           .reduce<Performance | undefined>((best, p) => {
             if (!best) return p;
@@ -267,7 +278,8 @@ export default function App() {
   }
 
   function rollDice() {
-    if (rolling || performances.length === 0) return;
+    const publicVideos = performances.filter(p => !p.membersOnly);
+    if (rolling || publicVideos.length === 0) return;
     setRolling(true);
     let ticks = 0;
     const total = 10;
@@ -276,7 +288,7 @@ export default function App() {
       ticks++;
       if (ticks >= total) {
         clearInterval(rollIntervalRef.current!);
-        const entry = performances[Math.floor(Math.random() * performances.length)];
+        const entry = publicVideos[Math.floor(Math.random() * publicVideos.length)];
         selectEntry(entry);
       }
     }, 60);
