@@ -113,7 +113,10 @@ export default function App() {
               },
               onStateChange({ data }: { data: number }) {
                 const { PLAYING, PAUSED, ENDED, CUED } = window.YT.PlayerState;
-                if ([PLAYING, PAUSED, ENDED, CUED].includes(data)) setLoadingYT(false);
+                if ([PLAYING, PAUSED, ENDED, CUED].includes(data)) {
+                  setLoadingYT(false);
+                  setRolling(false);
+                }
               },
             },
           });
@@ -190,7 +193,6 @@ export default function App() {
         clearInterval(rollIntervalRef.current!);
         const entry = performances[Math.floor(Math.random() * performances.length)];
         selectEntry(entry);
-        setRolling(false);
       }
     }, 60);
   }
