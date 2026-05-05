@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kannaoke — The Kanna Yanagi 🦆🔍 Karaoke Index</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/png" href="/favicon-96x96.png?v=20260504" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260504" />
+  <link rel="shortcut icon" href="/favicon.ico?v=20260504" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20260504" />
+  <link rel="manifest" href="/site.webmanifest?v=20260504" />
+</head>
+<body>
+  <header>
+    <h1>Kannaoke</h1>
+    <p class="subtitle">The Kanna Yanagi 🦆🔍 Karaoke Index</p>
+  </header>
+
+  <main>
+    <section class="results-panel">
+      <div class="search-bar">
+        <input
+          type="search"
+          id="search"
+          placeholder="Search songs or artists..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <span class="result-count" id="result-count"></span>
+      </div>
+      <ul id="results" role="list"></ul>
+    </section>
+
+    <div class="resize-handle" id="resize-handle"></div>
+
+    <aside class="player-panel" id="player-panel">
+      <div class="now-playing" id="now-playing" hidden>
+        <span class="now-playing-label">Now playing</span>
+        <span class="now-playing-title" id="now-playing-title"></span>
+        <span class="now-playing-artist" id="now-playing-artist"></span>
+        <span class="now-playing-stream" id="now-playing-stream"></span>
+      </div>
+      <div class="yt-container" id="yt-container">
+        <div id="yt-player"></div>
+        <div class="yt-loading" id="yt-loading" hidden>
+          <div class="yt-spinner"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    <p>Made by Kamos!</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
