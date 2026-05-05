@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Fuse from 'fuse.js';
+import type { IFuseOptions } from 'fuse.js';
 import {
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
   IconDice4Filled, IconDice5Filled, IconDice6Filled,
@@ -77,68 +78,109 @@ export default function App() {
   const [rolling, setRolling] = useState(false);
   const rollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const fuseOptions: IFuseOptions<Performance> = {
+    keys: ['title', 'artist', 'videoTitle'],
+    threshold: 0.4,
+    includeScore: true,
+    ignoreLocation: false,
+  };
+
   useEffect(() => {
-    fetch('/performances.json')
-      .then(r => r.json())
-      .then((data: Performance[]) => {
-        setPerformances(data);
-        fuseRef.current = new Fuse(data, {
-          keys: ['title', 'artist', 'videoTitle'],
-          threshold: 0.4,
-          includeScore: true,
-          ignoreLocation: false,
-        });
-        const random = data[Math.floor(Math.random() * data.length)];
-        const urlParams = new URLSearchParams(window.location.search);
-        const vParam = urlParams.get('v');
-        const tParam = urlParams.get('t');
-        const matched = vParam && tParam
-          ? data
-            .filter(p => p.videoId === vParam)
-            .reduce<Performance | undefined>((best, p) => {
-              if (!best) return p;
-              return Math.abs(p.startTime - Number(tParam)) < Math.abs(best.startTime - Number(tParam)) ? p : best;
-            }, undefined)
-          : undefined;
-        const initial = matched ?? random;
-        setActiveEntry(initial);
+    let cancelled = false;
 
-        window.onYouTubeIframeAPIReady = () => {
-          const entry = pendingRef.current ?? initial;
-          pendingRef.current = null;
-          const playerVars: Record<string, unknown> = {
-            rel: 0,
-            modestbranding: 1,
-            playsinline: 1,
-            start: entry.startTime,
-          };
-          if (entry.endTime != null) playerVars.end = entry.endTime;
-          ytPlayerRef.current = new window.YT.Player('yt-player', {
-            videoId: entry.videoId,
-            playerVars,
-            events: {
-              onReady() {
-                ytReadyRef.current = true;
-                if (pendingRef.current) {
-                  ytPlayerRef.current!.loadVideoById(videoParams(pendingRef.current));
-                  pendingRef.current = null;
-                }
-              },
-              onStateChange({ data }: { data: number }) {
-                const { PLAYING, PAUSED, ENDED, CUED } = window.YT.PlayerState;
-                if ([PLAYING, PAUSED, ENDED, CUED].includes(data)) {
-                  setLoadingYT(false);
-                  setRolling(false);
-                }
-              },
-            },
-          });
+    const initializeApp = (data: Performance[]) => {
+      if (cancelled) return;
+
+      setPerformances(data);
+      const random = data[Math.floor(Math.random() * data.length)];
+      const urlParams = new URLSearchParams(window.location.search);
+      const vParam = urlParams.get('v');
+      const tParam = urlParams.get('t');
+      const matched = vParam && tParam
+        ? data
+          .filter(p => p.videoId === vParam)
+          .reduce<Performance | undefined>((best, p) => {
+            if (!best) return p;
+            return Math.abs(p.startTime - Number(tParam)) < Math.abs(best.startTime - Number(tParam)) ? p : best;
+          }, undefined)
+        : undefined;
+      const initial = matched ?? random;
+      setActiveEntry(initial);
+
+      window.onYouTubeIframeAPIReady = () => {
+        const entry = pendingRef.current ?? initial;
+        pendingRef.current = null;
+        const playerVars: Record<string, unknown> = {
+          rel: 0,
+          modestbranding: 1,
+          playsinline: 1,
+          start: entry.startTime,
         };
+        if (entry.endTime != null) playerVars.end = entry.endTime;
+        ytPlayerRef.current = new window.YT.Player('yt-player', {
+          videoId: entry.videoId,
+          playerVars,
+          events: {
+            onReady() {
+              ytReadyRef.current = true;
+              if (pendingRef.current) {
+                ytPlayerRef.current!.loadVideoById(videoParams(pendingRef.current));
+                pendingRef.current = null;
+              }
+            },
+            onStateChange({ data }: { data: number }) {
+              const { PLAYING, PAUSED, ENDED, CUED } = window.YT.PlayerState;
+              if ([PLAYING, PAUSED, ENDED, CUED].includes(data)) {
+                setLoadingYT(false);
+                setRolling(false);
+              }
+            },
+          },
+        });
+      };
 
-        const tag = document.createElement('script');
-        tag.src = 'https://www.youtube.com/iframe_api';
-        document.head.appendChild(tag);
-      });
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    };
+
+    const loadData = async () => {
+      try {
+        const [dataRes, indexRes] = await Promise.all([
+          fetch('/performances.min.json'),
+          fetch('/performances.fuse-index.json'),
+        ]);
+
+        if (!dataRes.ok || !indexRes.ok) {
+          throw new Error('prebuilt data unavailable');
+        }
+
+        const [data, indexRaw] = await Promise.all([
+          dataRes.json() as Promise<Performance[]>,
+          indexRes.json(),
+        ]);
+
+        if (cancelled) return;
+        fuseRef.current = new Fuse(
+          data,
+          fuseOptions,
+          Fuse.parseIndex<Performance>(indexRaw),
+        );
+        initializeApp(data);
+      } catch {
+        const fallbackRes = await fetch('/performances.json');
+        const fallbackData = (await fallbackRes.json()) as Performance[];
+        if (cancelled) return;
+        fuseRef.current = new Fuse(fallbackData, fuseOptions);
+        initializeApp(fallbackData);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Drag-to-resize

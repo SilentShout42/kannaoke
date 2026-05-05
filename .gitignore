@@ -4,6 +4,10 @@ node_modules/
 # Build output
 dist/
 
+# Generated data artifacts
+public/performances.min.json
+public/performances.fuse-index.json
+
 # Wrangler
 .wrangler/
 .dev.vars

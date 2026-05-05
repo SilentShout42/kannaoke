@@ -2,7 +2,6 @@
   "name": "kannaoke",
   "compatibility_date": "2025-01-01",
   "assets": {
-    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
   }
 }
