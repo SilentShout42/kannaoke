@@ -97,7 +97,8 @@ export default function App() {
 
       // Filter to public videos only for initial selection
       const publicVideos = data.filter(p => !p.membersOnly);
-      const random = publicVideos[Math.floor(Math.random() * publicVideos.length)];
+      const randomPool = publicVideos.length > 0 ? publicVideos : data;
+      const random = randomPool[Math.floor(Math.random() * randomPool.length)];
 
       const urlParams = new URLSearchParams(window.location.search);
       const vParam = urlParams.get('v');
@@ -121,7 +122,13 @@ export default function App() {
       }
 
       const initial = matched ?? queryRandom ?? random;
-      setActiveEntry(initial);
+      if (matched) {
+        setActiveEntry(initial);
+      } else {
+        runDiceRoll(() => {
+          selectEntry(initial);
+        });
+      }
 
       window.onYouTubeIframeAPIReady = () => {
         const entry = pendingRef.current ?? initial;
@@ -291,9 +298,8 @@ export default function App() {
     }
   }
 
-  function rollDice() {
-    const publicVideos = performances.filter(p => !p.membersOnly);
-    if (rolling || publicVideos.length === 0) return;
+  function runDiceRoll(onComplete: () => void) {
+    if (rollIntervalRef.current) clearInterval(rollIntervalRef.current);
     setRolling(true);
     let ticks = 0;
     const total = 10;
@@ -302,10 +308,19 @@ export default function App() {
       ticks++;
       if (ticks >= total) {
         clearInterval(rollIntervalRef.current!);
-        const entry = publicVideos[Math.floor(Math.random() * publicVideos.length)];
-        selectEntry(entry);
+        rollIntervalRef.current = null;
+        onComplete();
       }
     }, 60);
+  }
+
+  function rollDice() {
+    const publicVideos = performances.filter(p => !p.membersOnly);
+    if (rolling || publicVideos.length === 0) return;
+    runDiceRoll(() => {
+      const entry = publicVideos[Math.floor(Math.random() * publicVideos.length)];
+      selectEntry(entry);
+    });
   }
 
   const byDate = (a: Performance, b: Performance) => b.videoDate.localeCompare(a.videoDate);
