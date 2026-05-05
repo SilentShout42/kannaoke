@@ -56,6 +56,17 @@
     "videoDate": "2024-10-31"
   },
   {
+<<<<<<< HEAD
+=======
+    "videoId": "-QBMXFnr17g",
+    "startTime": 0,
+    "title": "Kimi to Semi Blue",
+    "artist": "Raki · Miuna · Chiaki · Lottie · Arisu · Chio · Kanna Yanagi · Daiya",
+    "videoTitle": "「Kimi to Semi Blue」PixelLink Cover Ver. #PixelSummer2024",
+    "videoDate": "2024-09-05"
+  },
+  {
+>>>>>>> 06eacc0 (covers data)
     "videoId": "2oaBT0fDmW0",
     "startTime": 0,
     "title": "YONA YONA DANCE - 和田アキ子",
