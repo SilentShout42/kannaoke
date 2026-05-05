@@ -325,7 +325,14 @@ export default function App() {
 
   const byDate = (a: Performance, b: Performance) => b.videoDate.localeCompare(a.videoDate);
   const sorted = query.trim()
-    ? (fuseRef.current?.search(query).map(r => r.item) ?? []).sort(byDate)
+    ? (fuseRef.current?.search(query) ?? [])
+      .sort((a, b) => {
+        const scoreA = a.score ?? Number.POSITIVE_INFINITY;
+        const scoreB = b.score ?? Number.POSITIVE_INFINITY;
+        if (scoreA !== scoreB) return scoreA - scoreB;
+        return b.item.videoDate.localeCompare(a.item.videoDate);
+      })
+      .map(r => r.item)
     : [...performances].sort(byDate);
 
   return (
