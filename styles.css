@@ -9,7 +9,7 @@
   --text: #e8e0f0;
   --text-muted: #8a80a0;
   --text-faint: #5a5270;
-  --player-width: 420px;
+  --player-width: 55%;
   --header-h: 90px;
   --search-h: 64px;
 }
@@ -101,6 +101,7 @@ main {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr var(--player-width);
+  min-height: calc(100vh - var(--header-h) - var(--search-h));
   align-items: start;
   overflow: hidden;
 }
