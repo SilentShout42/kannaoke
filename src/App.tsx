@@ -107,6 +107,7 @@ export default function App() {
       const urlParams = new URLSearchParams(window.location.search);
       const vParam = urlParams.get('v');
       const tParam = urlParams.get('t');
+      const qParam = urlParams.get('q')?.trim() ?? '';
       const matched = vParam && tParam
         ? markedData
           .filter(p => p.videoId === vParam)
@@ -115,7 +116,16 @@ export default function App() {
             return Math.abs(p.startTime - Number(tParam)) < Math.abs(best.startTime - Number(tParam)) ? p : best;
           }, undefined)
         : undefined;
-      const initial = matched ?? random;
+
+      let queryRandom: Performance | undefined;
+      if (!matched && qParam && !vParam && !tParam) {
+        const queryPool = new Fuse(publicVideos, fuseOptions).search(qParam).map(r => r.item);
+        if (queryPool.length > 0) {
+          queryRandom = queryPool[Math.floor(Math.random() * queryPool.length)];
+        }
+      }
+
+      const initial = matched ?? queryRandom ?? random;
       setActiveEntry(initial);
 
       window.onYouTubeIframeAPIReady = () => {
