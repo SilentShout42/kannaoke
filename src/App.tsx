@@ -3,7 +3,7 @@ import Fuse from 'fuse.js';
 import type { IFuseOptions } from 'fuse.js';
 import {
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
-  IconDice4Filled, IconDice5Filled, IconDice6Filled, IconLockSquareRoundedFilled,
+  IconDice4Filled, IconDice5Filled, IconDice6Filled, IconLockSquareRoundedFilled, IconX,
 } from '@tabler/icons-react';
 
 const DICE_ICONS = [
@@ -73,6 +73,7 @@ export default function App() {
   const pendingRef = useRef<Performance | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const resultsRef = useRef<HTMLUListElement | null>(null);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [diceIndex, setDiceIndex] = useState(0);
@@ -330,14 +331,31 @@ export default function App() {
       <main ref={e => { mainRef.current = e; }}>
         <section className="results-panel" ref={e => { panelRef.current = e; }}>
           <div className="search-bar">
-            <input
-              type="search"
-              placeholder="Search songs or artists..."
-              autoComplete="off"
-              spellCheck={false}
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-            />
+            <div className="search-input-wrap">
+              <input
+                ref={searchInputRef}
+                type="search"
+                placeholder="Search songs or artists..."
+                autoComplete="off"
+                spellCheck={false}
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+              />
+              {query.trim() && (
+                <button
+                  type="button"
+                  className="search-clear-btn"
+                  aria-label="Clear search"
+                  title="Clear search"
+                  onClick={() => {
+                    setQuery('');
+                    searchInputRef.current?.focus();
+                  }}
+                >
+                  <IconX size={15} stroke={2.2} />
+                </button>
+              )}
+            </div>
             <span className="result-count">
               {sorted.length > 0
                 ? `${sorted.length} song${sorted.length !== 1 ? 's' : ''}`

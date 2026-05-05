@@ -104,19 +104,49 @@ header .subtitle {
   flex-shrink: 0;
 }
 
-.search-bar input {
+.search-input-wrap {
+  position: relative;
   flex: 1;
+}
+
+.search-bar input {
+  width: 100%;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
   font-size: 1rem;
   font-family: inherit;
-  padding: 0.625rem 1rem;
+  padding: 0.625rem 2.4rem 0.625rem 1rem;
   outline: none;
   transition: border-color 0.15s;
   -webkit-appearance: none;
   appearance: none;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.125rem;
+  border-radius: 4px;
+}
+
+.search-clear-btn:hover {
+  color: var(--text);
+}
+
+.search-clear-btn:focus-visible {
+  outline: 2px solid var(--accent-dim);
+  outline-offset: 1px;
 }
 
 .search-bar input::placeholder {
