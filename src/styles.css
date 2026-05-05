@@ -250,9 +250,27 @@ main {
   font-size: 0.7rem;
   color: var(--text-faint);
   margin-top: 0.125rem;
+}
+
+.song-stream-text {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.result-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.members-only-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
 }
 
 .time-badge {

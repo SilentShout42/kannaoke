@@ -3,7 +3,7 @@ import Fuse from 'fuse.js';
 import type { IFuseOptions } from 'fuse.js';
 import {
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
-  IconDice4Filled, IconDice5Filled, IconDice6Filled,
+  IconDice4Filled, IconDice5Filled, IconDice6Filled, IconLockSquareRoundedFilled,
 } from '@tabler/icons-react';
 
 const DICE_ICONS = [
@@ -19,7 +19,7 @@ interface Performance {
   videoDate: string;
   startTime: number;
   endTime: number | null;
-  membersOnly?: boolean;
+  membersOnly: boolean;
 }
 
 declare global {
@@ -92,24 +92,18 @@ export default function App() {
     const initializeApp = (data: Performance[]) => {
       if (cancelled) return;
 
-      // Mark members-only videos
-      const markedData = data.map(p => ({
-        ...p,
-        membersOnly: p.videoTitle.includes("Member's Handcam Stream")
-      }));
+      setPerformances(data);
 
-      setPerformances(markedData);
-      
       // Filter to public videos only for initial selection
-      const publicVideos = markedData.filter(p => !p.membersOnly);
+      const publicVideos = data.filter(p => !p.membersOnly);
       const random = publicVideos[Math.floor(Math.random() * publicVideos.length)];
-      
+
       const urlParams = new URLSearchParams(window.location.search);
       const vParam = urlParams.get('v');
       const tParam = urlParams.get('t');
       const qParam = urlParams.get('q')?.trim() ?? '';
       const matched = vParam && tParam
-        ? markedData
+        ? data
           .filter(p => p.videoId === vParam)
           .reduce<Performance | undefined>((best, p) => {
             if (!best) return p;
@@ -181,19 +175,28 @@ export default function App() {
           indexRes.json(),
         ]);
 
+        const markedData = data.map(p => ({
+          ...p,
+          membersOnly: p.videoTitle.includes("Member's Handcam Stream"),
+        }));
+
         if (cancelled) return;
         fuseRef.current = new Fuse(
-          data,
+          markedData,
           fuseOptions,
           Fuse.parseIndex<Performance>(indexRaw),
         );
-        initializeApp(data);
+        initializeApp(markedData);
       } catch {
         const fallbackRes = await fetch('/performances.json');
         const fallbackData = (await fallbackRes.json()) as Performance[];
+        const markedFallbackData = fallbackData.map(p => ({
+          ...p,
+          membersOnly: p.videoTitle.includes("Member's Handcam Stream"),
+        }));
         if (cancelled) return;
-        fuseRef.current = new Fuse(fallbackData, fuseOptions);
-        initializeApp(fallbackData);
+        fuseRef.current = new Fuse(markedFallbackData, fuseOptions);
+        initializeApp(markedFallbackData);
       }
     };
 
@@ -366,9 +369,22 @@ export default function App() {
                   <div className="result-text">
                     <div className="song-title">{entry.title}</div>
                     <div className="song-artist">{entry.artist}</div>
-                    <div className="song-stream">{entry.videoDate} · {entry.videoTitle}</div>
+                    <div className="song-stream">
+                      <span className="song-stream-text">{entry.videoDate} · {entry.videoTitle}</span>
+                    </div>
                   </div>
-                  <span className="time-badge">{timeLabel(entry)}</span>
+                  <div className="result-meta">
+                    {entry.membersOnly && (
+                      <span
+                        className="members-only-indicator"
+                        title="Members-only stream"
+                        aria-label="Members-only stream"
+                      >
+                        <IconLockSquareRoundedFilled size={24} />
+                      </span>
+                    )}
+                    <span className="time-badge">{timeLabel(entry)}</span>
+                  </div>
                 </li>
               ))
             )}
