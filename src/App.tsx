@@ -146,16 +146,20 @@ export default function App() {
           events: {
             onReady() {
               ytReadyRef.current = true;
+              setRolling(false);
+              setLoadingYT(false);
               if (pendingRef.current) {
                 ytPlayerRef.current!.loadVideoById(videoParams(pendingRef.current));
                 pendingRef.current = null;
               }
             },
             onStateChange({ data }: { data: number }) {
-              const { PLAYING, PAUSED, ENDED, CUED } = window.YT.PlayerState;
+              const { PLAYING, PAUSED, ENDED, CUED, BUFFERING } = window.YT.PlayerState;
+              if ([BUFFERING, CUED].includes(data)) {
+                setRolling(false);
+              }
               if ([PLAYING, PAUSED, ENDED, CUED].includes(data)) {
                 setLoadingYT(false);
-                setRolling(false);
               }
             },
           },
