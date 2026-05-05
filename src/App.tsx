@@ -87,7 +87,19 @@ export default function App() {
           threshold: 0.4,
           includeScore: true,
         });
-        const initial = data[Math.floor(Math.random() * data.length)];
+        const random = data[Math.floor(Math.random() * data.length)];
+        const urlParams = new URLSearchParams(window.location.search);
+        const vParam = urlParams.get('v');
+        const tParam = urlParams.get('t');
+        const matched = vParam && tParam
+          ? data
+            .filter(p => p.videoId === vParam)
+            .reduce<Performance | undefined>((best, p) => {
+              if (!best) return p;
+              return Math.abs(p.startTime - Number(tParam)) < Math.abs(best.startTime - Number(tParam)) ? p : best;
+            }, undefined)
+          : undefined;
+        const initial = matched ?? random;
         setActiveEntry(initial);
 
         window.onYouTubeIframeAPIReady = () => {
@@ -171,6 +183,36 @@ export default function App() {
       ?.scrollIntoView({ block: 'nearest' });
   }, [activeEntry]);
 
+  // Seed query from ?q= on mount
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get('q');
+    if (q) setQuery(q);
+  }, []);
+
+  // Sync query → URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (query.trim()) {
+      params.set('q', query);
+    } else {
+      params.delete('q');
+    }
+    const next = params.toString() ? `?${params.toString()}` : window.location.pathname;
+    const current = window.location.search || '';
+    const expected = params.toString() ? `?${params.toString()}` : '';
+    if (current !== expected) history.replaceState(null, '', next);
+  }, [query]);
+
+  // Sync active entry → URL
+  useEffect(() => {
+    if (!activeEntry) return;
+    const params = new URLSearchParams(window.location.search);
+    params.set('v', activeEntry.videoId);
+    params.set('t', String(activeEntry.startTime));
+    const next = `?${params.toString()}`;
+    if (window.location.search !== next) history.replaceState(null, '', next);
+  }, [activeEntry]);
+
   function selectEntry(entry: Performance) {
     setActiveEntry(entry);
     setLoadingYT(true);
@@ -205,7 +247,7 @@ export default function App() {
   return (
     <>
       <header>
-        <h1>Kannaoke</h1>
+        <h1><a className="home-link" href="/" onClick={e => { e.preventDefault(); setQuery(''); setActiveEntry(null); history.pushState(null, '', '/'); }}>Kannaoke</a></h1>
         <p className="subtitle">The Kanna Yanagi 🦆🔍 Karaoke Index</p>
         <button
           className={`dice-btn${rolling ? ' rolling' : ''}`}
@@ -225,6 +267,7 @@ export default function App() {
               placeholder="Search songs or artists..."
               autoComplete="off"
               spellCheck={false}
+              value={query}
               onChange={e => setQuery(e.target.value)}
             />
             <span className="result-count">

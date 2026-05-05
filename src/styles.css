@@ -14,7 +14,9 @@
   --video-max-h: calc(100vh - 250px);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -58,6 +60,12 @@ header h1 {
   font-weight: 700;
   color: var(--accent);
   letter-spacing: -0.02em;
+}
+
+header h1 .home-link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 header .subtitle {
@@ -158,7 +166,8 @@ main {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-y: overlay; /* overlay scrollbar so content stays flush with the divider */
+  overflow-y: overlay;
+  /* overlay scrollbar so content stays flush with the divider */
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
@@ -350,7 +359,9 @@ main {
   pointer-events: none;
 }
 
-.yt-loading[hidden] { display: none; }
+.yt-loading[hidden] {
+  display: none;
+}
 
 .yt-spinner {
   width: 40px;
@@ -362,7 +373,9 @@ main {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mobile */
