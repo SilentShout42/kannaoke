@@ -323,14 +323,20 @@ export default function App() {
     });
   }
 
-  const byDate = (a: Performance, b: Performance) => b.videoDate.localeCompare(a.videoDate);
+  const byDate = (a: Performance, b: Performance) => {
+    const dateCmp = b.videoDate.localeCompare(a.videoDate);
+    if (dateCmp !== 0) return dateCmp;
+    const videoCmp = a.videoId.localeCompare(b.videoId);
+    if (videoCmp !== 0) return videoCmp;
+    return a.startTime - b.startTime;
+  };
   const sorted = query.trim()
     ? (fuseRef.current?.search(query) ?? [])
       .sort((a, b) => {
         const scoreA = a.score ?? Number.POSITIVE_INFINITY;
         const scoreB = b.score ?? Number.POSITIVE_INFINITY;
         if (scoreA !== scoreB) return scoreA - scoreB;
-        return b.item.videoDate.localeCompare(a.item.videoDate);
+        return byDate(a.item, b.item);
       })
       .map(r => r.item)
     : [...performances].sort(byDate);
