@@ -195,9 +195,10 @@ export default function App() {
     }, 60);
   }
 
+  const byDate = (a: Performance, b: Performance) => b.videoDate.localeCompare(a.videoDate);
   const sorted = query.trim()
-    ? (fuseRef.current?.search(query).map(r => r.item) ?? [])
-    : [...performances].sort((a, b) => a.title.localeCompare(b.title));
+    ? (fuseRef.current?.search(query).map(r => r.item) ?? []).sort(byDate)
+    : [...performances].sort(byDate);
 
   return (
     <>
