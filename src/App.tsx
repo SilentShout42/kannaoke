@@ -95,8 +95,8 @@ export default function App() {
 
       setPerformances(data);
 
-      // Filter to public videos only for initial selection
-      const publicVideos = data.filter(p => !p.membersOnly);
+      // Filter to public, non-cover videos for random selection
+      const publicVideos = data.filter(p => !p.membersOnly && !/cover/i.test(p.videoTitle));
       const randomPool = publicVideos.length > 0 ? publicVideos : data;
       const random = randomPool[Math.floor(Math.random() * randomPool.length)];
 
@@ -315,7 +315,7 @@ export default function App() {
   }
 
   function rollDice() {
-    const publicVideos = performances.filter(p => !p.membersOnly);
+    const publicVideos = performances.filter(p => !p.membersOnly && !/cover/i.test(p.videoTitle));
     if (rolling || publicVideos.length === 0) return;
     runDiceRoll(() => {
       const entry = publicVideos[Math.floor(Math.random() * publicVideos.length)];
