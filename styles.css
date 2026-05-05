@@ -275,20 +275,6 @@ main {
   to { transform: rotate(360deg); }
 }
 
-.player-placeholder {
-  aspect-ratio: 16 / 9;
-  background: var(--bg-surface);
-  border: 1px dashed var(--border);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-faint);
-  font-size: 0.875rem;
-  text-align: center;
-  padding: 1rem;
-}
-
 /* Footer */
 footer {
   padding: 1rem 2rem;

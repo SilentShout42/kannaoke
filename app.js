@@ -166,8 +166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   activeEntry = allPerformances[Math.floor(Math.random() * allPerformances.length)];
   setNowPlaying(activeEntry);
-  document.getElementById('player-placeholder').hidden = true;
-
   fuse = new Fuse(allPerformances, {
     keys: ['title', 'artist', 'videoTitle'],
     threshold: 0.4,
