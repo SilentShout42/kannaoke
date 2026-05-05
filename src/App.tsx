@@ -126,7 +126,7 @@ export default function App() {
         setActiveEntry(initial);
       } else {
         runDiceRoll(() => {
-          selectEntry(initial);
+          setActiveEntry(initial);
         });
       }
 
