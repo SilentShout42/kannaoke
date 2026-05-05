@@ -10,8 +10,8 @@
   --text-muted: #8a80a0;
   --text-faint: #5a5270;
   --song-list-width: 420px;
-  /* header ~90px + footer ~48px + player padding 2*1.25rem + now-playing ~100px + gap 0.875rem */
-  --video-max-h: calc(100vh - 300px);
+  /* header ~80px + player padding 2*1.25rem + now-playing ~100px + gap 0.875rem */
+  --video-max-h: calc(100vh - 250px);
 }
 
 *, *::before, *::after {
@@ -45,10 +45,10 @@ body {
 
 /* Header */
 header {
-  padding: 1.5rem 2rem 1rem;
+  padding: 1rem 1.5rem;
   border-bottom: 1px solid var(--border);
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 1rem;
   flex-shrink: 0;
 }
@@ -343,16 +343,6 @@ main {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-/* Footer */
-footer {
-  padding: 1rem 2rem;
-  border-top: 1px solid var(--border);
-  color: var(--text-faint);
-  font-size: 0.75rem;
-  text-align: center;
-  flex-shrink: 0;
 }
 
 /* Mobile */

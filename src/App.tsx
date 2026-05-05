@@ -245,10 +245,6 @@ export default function App() {
           </div>
         </aside>
       </main>
-
-      <footer>
-        <p>Made by Kamos!</p>
-      </footer>
     </>
   );
 }
