@@ -163,6 +163,11 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    document.querySelector('#results .result-item.active')
+      ?.scrollIntoView({ block: 'nearest' });
+  }, [activeEntry]);
+
   function selectEntry(entry: Performance) {
     setActiveEntry(entry);
     setLoadingYT(true);
