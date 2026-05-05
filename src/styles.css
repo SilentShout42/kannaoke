@@ -10,6 +10,8 @@
   --text-muted: #8a80a0;
   --text-faint: #5a5270;
   --song-list-width: 420px;
+  /* header ~90px + footer ~48px + player padding 2*1.25rem + now-playing ~100px + gap 0.875rem */
+  --video-max-h: calc(100vh - 300px);
 }
 
 *, *::before, *::after {
@@ -258,6 +260,7 @@ main {
 .yt-container {
   position: relative;
   width: 100%;
+  max-width: calc(var(--video-max-h) * 16 / 9);
   aspect-ratio: 16 / 9;
   border-radius: 8px;
   overflow: hidden;
