@@ -180,7 +180,7 @@
     "videoId": "mvUBPy4uYgk",
     "startTime": 5183,
     "title": "Aishiteru",
-    "artist": "Kourin (Natsume Yuujin-chou)",
+    "artist": "Kourin · Natsume Yuujinchou",
     "videoTitle": "Singing songs just for you💕✨【歌枠 - KARAOKE】",
     "videoDate": "2024-10-14"
   },
@@ -793,7 +793,7 @@
     "videoId": "e9oMpoQtWfQ",
     "startTime": 5673,
     "title": "Fiction",
-    "artist": "Sumika",
+    "artist": "Sumika · Wotakoi",
     "videoTitle": "First Karaoke!! Can this duck sing?【KARAOKE】",
     "videoDate": "2024-07-06"
   },
@@ -801,7 +801,7 @@
     "videoId": "qznR-sN3UAY",
     "startTime": 2826,
     "title": "Fiction",
-    "artist": "Sumika",
+    "artist": "Sumika · Wotakoi",
     "videoTitle": "New Bedroom Reveal! You'll Like It Right?🥺",
     "videoDate": "2024-12-08"
   },
@@ -1178,8 +1178,8 @@
   {
     "videoId": "e9oMpoQtWfQ",
     "startTime": 9753,
-    "title": "Ima, Kono Toki",
-    "artist": "Natsume Yujin-cho",
+    "title": "Ima, kono toki",
+    "artist": "Hiiragi · Natsume Yuujinchou",
     "videoTitle": "First Karaoke!! Can this duck sing?【KARAOKE】",
     "videoDate": "2024-07-06"
   },
@@ -3508,8 +3508,8 @@
     {
       "videoId": "PUud6Zjv9V0",
       "startTime": 10727,
-      "title": "Every Second (JP ver.)",
-      "artist": "Kanna Yanagi",
+      "title": "Every Second",
+      "artist": "Mina Okabe",
       "videoTitle": "Christmas Karaoke Party!🎄💝 Let me sing for you~【歌枠 | Karaoke】",
       "videoDate": "2025-12-21"
     },
@@ -3736,5 +3736,189 @@
       "artist": "Hibiki Ganaha · Idolmaster",
       "videoTitle": "Handcam & ...Singing?!✨Duck girl shenanigans is happening today!",
       "videoDate": "2026-01-26"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 1048,
+      "title": "Nukumori",
+      "artist": "Home Made Kazoku · Naruto",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 1814,
+      "title": "Every Second",
+      "artist": "Mina Okabe",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 2181,
+      "title": "Aishiteru",
+      "artist": "Kourin · Natsume Yuujinchou",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 2490,
+      "title": "Michishirube",
+      "artist": "Minori Chihara · Violet Evergarden",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 2884,
+      "title": "Kiss Me",
+      "artist": "Sixpence None the Richer",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 3266,
+      "title": "Make You Feel My Love",
+      "artist": "Adele",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 3564,
+      "title": "All of Me",
+      "artist": "John Legend",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 3970,
+      "title": "Listen to Your Heart",
+      "artist": "Roxette",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 4668,
+      "title": "Iris",
+      "artist": "Goo Goo Dolls",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 5012,
+      "title": "Fiction",
+      "artist": "Sumika · Wotakoi",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 5282,
+      "title": "I'm Yours",
+      "artist": "Jason Mraz",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 5650,
+      "title": "Cinderella",
+      "artist": "Cinder Girl · Komi-San",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 6153,
+      "title": "Danna-sama to no Love Love Love Song",
+      "artist": "Fenris (CV: Rie Kugimiya) · Lv2 kara Cheat datta Motoyuusha Kouho no Mattari Isekai Life",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 6494,
+      "title": "Ima, kono toki",
+      "artist": "Hiiragi · Natsume Yuujinchou",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 6899,
+      "title": "Kanade",
+      "artist": "Sukima Switch",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 7268,
+      "title": "Love Dramatic",
+      "artist": "Masayuki Suzuki feat. Rikka Ihara",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 7567,
+      "title": "Daddy ! Daddy ! Do !",
+      "artist": "Masayuki Suzuki · Airi Suzuki · Love is War",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 7916,
+      "title": "Abracadabra",
+      "artist": "Steve Miller Band",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 8437,
+      "title": "Amame",
+      "artist": "Sergio Dalma",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 8808,
+      "title": "Life is Like a Boat",
+      "artist": "Rie Fu",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 9217,
+      "title": "Can You Feel the Love Tonight",
+      "artist": "Elton John",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 9568,
+      "title": "All Your'n",
+      "artist": "Tyler Childers",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
+    },
+    {
+      "videoId": "SYNSzQg5E2U",
+      "startTime": 9866,
+      "title": "Somewhere Only We Know",
+      "artist": "Keane",
+      "videoTitle": "Singing sweet Love Songs for you~💖【歌枠 - Valentine's Karaoke】",
+      "videoDate": "2026-02-14"
     }
 ]
