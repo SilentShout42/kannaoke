@@ -130,7 +130,7 @@ export default function App() {
       if (!matched && qParam && !vParam && !tParam) {
         const queryPool = new Fuse(publicVideos, fuseOptions).search(prepareQuery(qParam)).map(r => r.item);
         if (queryPool.length > 0) {
-          queryRandom = queryPool[Math.floor(Math.random() * queryPool.length)];
+          queryRandom = queryPool[0];
         }
       }
 
