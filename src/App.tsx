@@ -371,6 +371,14 @@ export default function App() {
         >
           {(() => { const Icon = DICE_ICONS[diceIndex]; return <Icon size={28} />; })()}
         </button>
+        <a
+          className="feedback-link"
+          href="https://marshmallow-qa.com/wco0tcuk8ipq15i"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Send feedback 💌
+        </a>
       </header>
 
       <main ref={e => { mainRef.current = e; }}>
