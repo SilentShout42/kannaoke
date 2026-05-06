@@ -84,7 +84,20 @@ export default function App() {
     keys: ['title', 'artist', 'videoTitle'],
     threshold: 0.4,
     includeScore: true,
-    ignoreLocation: false,
+    ignoreLocation: true,
+    useExtendedSearch: true,
+  };
+
+  // Convert "quoted" or 'quoted' input to Fuse exact-include syntax ('term).
+  const prepareQuery = (q: string): string => {
+    const t = q.trim();
+    if (
+      (t.startsWith('"') && t.endsWith('"')) ||
+      (t.startsWith("'") && t.endsWith("'"))
+    ) {
+      return "'" + t.slice(1, -1);
+    }
+    return q;
   };
 
   useEffect(() => {
@@ -115,7 +128,7 @@ export default function App() {
 
       let queryRandom: Performance | undefined;
       if (!matched && qParam && !vParam && !tParam) {
-        const queryPool = new Fuse(publicVideos, fuseOptions).search(qParam).map(r => r.item);
+        const queryPool = new Fuse(publicVideos, fuseOptions).search(prepareQuery(qParam)).map(r => r.item);
         if (queryPool.length > 0) {
           queryRandom = queryPool[Math.floor(Math.random() * queryPool.length)];
         }
@@ -335,7 +348,7 @@ export default function App() {
     return a.startTime - b.startTime;
   };
   const sorted = query.trim()
-    ? (fuseRef.current?.search(query) ?? [])
+    ? (fuseRef.current?.search(prepareQuery(query)) ?? [])
       .sort((a, b) => {
         const scoreA = a.score ?? Number.POSITIVE_INFINITY;
         const scoreB = b.score ?? Number.POSITIVE_INFINITY;
