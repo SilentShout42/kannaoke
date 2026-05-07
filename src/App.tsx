@@ -77,17 +77,19 @@ export default function App() {
   };
 
   const scrollActiveToSafeZone = () => {
-    const list = resultsRef.current;
-    const item = list?.querySelector<HTMLElement>('.result-item.active');
-    if (!list || !item) return;
-    const fadeH = parseFloat(getComputedStyle(document.documentElement).fontSize) * 3;
-    const itemTop = item.offsetTop - list.scrollTop;
-    const itemBottom = itemTop + item.offsetHeight;
-    if (itemTop >= fadeH && itemBottom <= list.clientHeight - fadeH) return;
-    const top = itemTop < fadeH
-      ? item.offsetTop - fadeH
-      : item.offsetTop + item.offsetHeight - list.clientHeight + fadeH;
-    list.scrollTo({ top, behavior: 'smooth' });
+    requestAnimationFrame(() => {
+      const list = resultsRef.current;
+      const item = list?.querySelector<HTMLElement>('.result-item.active');
+      if (!list || !item) return;
+      const fadeH = parseFloat(getComputedStyle(document.documentElement).fontSize) * 3;
+      const itemTop = item.offsetTop - list.scrollTop;
+      const itemBottom = itemTop + item.offsetHeight;
+      if (itemTop >= fadeH && itemBottom <= list.clientHeight - fadeH) return;
+      const top = itemTop < fadeH
+        ? item.offsetTop - fadeH
+        : item.offsetTop + item.offsetHeight - list.clientHeight + fadeH;
+      list.scrollTo({ top, behavior: 'smooth' });
+    });
   };
   const [diceIndex, setDiceIndex] = useState(0);
   const [rolling, setRolling] = useState(false);
@@ -390,7 +392,7 @@ export default function App() {
     : [...performances].sort(byDate);
 
   // Re-evaluate fade after every list change (data load, query, scroll-to-center)
-  useEffect(() => { updateScrollFade(); });
+  useEffect(() => { requestAnimationFrame(updateScrollFade); });
 
   return (
     <>
@@ -498,6 +500,7 @@ export default function App() {
                     {/cover/i.test(entry.videoTitle) && (
                       <span
                         className="cover-indicator"
+                        role="img"
                         title="Cover song"
                         aria-label="Cover song"
                       >
@@ -507,6 +510,7 @@ export default function App() {
                     {entry.membersOnly && (
                       <span
                         className="members-only-indicator"
+                        role="img"
                         title="Members-only stream"
                         aria-label="Members-only stream"
                       >
