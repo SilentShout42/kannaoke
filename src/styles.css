@@ -1,15 +1,31 @@
 :root {
-  --bg: #0f0f13;
-  --bg-surface: #1a1a22;
-  --bg-hover: #22222e;
-  --bg-active: #2a1f3d;
-  --border: #2e2e3e;
-  --accent: #b47eef;
-  --accent-dim: #7c4bb0;
-  --text: #e8e0f0;
-  --text-muted: #8a80a0;
-  --text-faint: #5a5270;
   --song-list-width: 420px;
+
+  /* Dark theme — night forest: deep green shadows, golden-amber hair accent */
+  --bg: #0b120b;
+  --bg-surface: #131e13;
+  --bg-hover: #1b2a1b;
+  --bg-active: #1e3020;
+  --border: #2a3f2a;
+  --accent: #c8902a;
+  --accent-dim: #966820;
+  --text: #ede8dd;
+  --text-muted: #7a9870;
+  --text-faint: #3d5c38;
+}
+
+[data-theme="light"] {
+  /* Light theme — parchment ref sheet: cream background, forest green accent */
+  --bg: #f0ebe0;
+  --bg-surface: #e5dfd3;
+  --bg-hover: #d8d2c4;
+  --bg-active: #c5d9b8;
+  --border: #c0b89e;
+  --accent: #3a5828;
+  --accent-dim: #2b421d;
+  --text: #1a2618;
+  --text-muted: #4a6040;
+  --text-faint: #7a8e6a;
 }
 
 *,
@@ -87,6 +103,25 @@ header .subtitle {
 }
 
 .dice-btn:hover {
+  color: var(--accent);
+}
+
+.theme-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.theme-btn:hover {
   color: var(--accent);
 }
 

@@ -4,6 +4,7 @@ import type { IFuseOptions } from 'fuse.js';
 import {
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
   IconDice4Filled, IconDice5Filled, IconDice6Filled, IconDiscFilled, IconLockSquareRoundedFilled, IconX,
+  IconSun, IconMoon,
 } from '@tabler/icons-react';
 
 import { formatDate } from './formatDate';
@@ -68,6 +69,15 @@ export default function App() {
   const [diceIndex, setDiceIndex] = useState(0);
   const [rolling, setRolling] = useState(false);
   const rollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [theme, setTheme] = useState<'dark' | 'light'>(
+    () => (localStorage.getItem('theme') as 'dark' | 'light' | null)
+      ?? (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   const fuseOptions: IFuseOptions<Performance> = {
     keys: ['title', 'artist', 'videoTitle'],
@@ -368,6 +378,14 @@ export default function App() {
           title="Play random song"
         >
           {(() => { const Icon = DICE_ICONS[diceIndex]; return <Icon size={28} />; })()}
+        </button>
+        <button
+          className="theme-btn"
+          onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+          aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+        >
+          {theme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
         </button>
         <a
           className="feedback-link"
