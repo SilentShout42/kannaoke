@@ -198,7 +198,7 @@ export default function App() {
         fuseRef.current = new Fuse(
           markedData,
           fuseOptions,
-          Fuse.parseIndex<Performance>(indexRaw),
+          Fuse.parseIndex<Performance>(indexRaw as Parameters<typeof Fuse.parseIndex>[0]),
         );
         initializeApp(markedData);
       } catch {

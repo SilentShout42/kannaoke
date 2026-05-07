@@ -1,7 +1,3 @@
-interface Env {
-  ASSETS: { fetch(request: Request): Promise<Response> };
-}
-
 interface Performance {
   videoId: string;
   startTime: number;
@@ -40,9 +36,9 @@ export default {
 
     return env.ASSETS.fetch(request);
   },
-};
+} satisfies ExportedHandler<Env>;
 
-const performancesCache = new WeakMap<Env['ASSETS'], Performance[]>();
+const performancesCache = new WeakMap<Fetcher, Performance[]>();
 
 async function findEntry(
   env: Env,
