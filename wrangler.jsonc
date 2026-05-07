@@ -1,7 +1,14 @@
 {
   "name": "kannaoke",
-  "compatibility_date": "2025-01-01",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-05-06",
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
   }
 }

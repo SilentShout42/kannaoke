@@ -34,7 +34,8 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-graphify-out/manifest.json    # mtime-based, breaks after git clone
-graphify-out/cost.json        # local only
-# graphify-out/cache/         # optional: commit for speed, skip to keep repo small
+# graphify-out: mtime manifest and cost log are local-only
+graphify-out/manifest.json
+graphify-out/cost.json
+# graphify-out/cache/  optional: commit for speed, skip to keep repo small
 
