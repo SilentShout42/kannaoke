@@ -274,6 +274,12 @@ export default function App() {
       ?.scrollIntoView({ block: 'nearest' });
   }, [activeEntry]);
 
+  useEffect(() => {
+    document.title = activeEntry
+      ? `${activeEntry.title} | Kannaoke`
+      : 'Kannaoke';
+  }, [activeEntry]);
+
   // Seed query from ?q= on mount
   useEffect(() => {
     const q = new URLSearchParams(window.location.search).get('q');
@@ -369,7 +375,7 @@ export default function App() {
   return (
     <>
       <header>
-        <h1><a className="home-link" href="/" onClick={e => { e.preventDefault(); setQuery(''); setActiveEntry(null); history.pushState(null, '', '/'); }}>Kannaoke</a></h1>
+        <h1><a className="home-link" href="/" onClick={e => { e.preventDefault(); setQuery(''); history.pushState(null, '', '/'); }}>Kannaoke</a></h1>
         <p className="subtitle">The Kanna Yanagi 🦆🔍 Karaoke Index</p>
         <button
           className={`dice-btn${rolling ? ' rolling' : ''}`}
