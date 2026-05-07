@@ -1,0 +1,1989 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {
+    "hyperedges": [
+      {
+        "id": "build_pipeline_hyper",
+        "label": "Build pipeline: validate-dedupe-sort-index",
+        "nodes": [
+          "build_main_fn",
+          "normalize_entry",
+          "dedupe_entries",
+          "sort_entries",
+          "fuse_build_index"
+        ],
+        "relation": "form",
+        "confidence": "EXTRACTED",
+        "confidence_score": 1.0,
+        "source_file": "scripts/build-performances.mjs"
+      },
+      {
+        "id": "url_param_hyper",
+        "label": "URL param system: bidirectional sync",
+        "nodes": [
+          "seed_query_effect",
+          "seed_query_url_sync",
+          "active_entry_url_sync",
+          "seeded_initial_state"
+        ],
+        "relation": "form",
+        "confidence": "INFERRED",
+        "confidence_score": 0.8,
+        "source_file": "src/App.tsx"
+      },
+      {
+        "id": "ui_layout_hyper",
+        "label": "Two-panel responsive layout",
+        "nodes": [
+          "ui_results_panel",
+          "ui_player_panel",
+          "drag_resize_handle"
+        ],
+        "relation": "implement",
+        "confidence": "INFERRED",
+        "confidence_score": 0.75,
+        "source_file": "src/App.tsx"
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "label": "vite.config.ts",
+      "file_type": "code",
+      "source_file": "vite.config.ts",
+      "source_location": "L1",
+      "id": "vite_config_ts",
+      "community": 8,
+      "norm_label": "vite.config.ts"
+    },
+    {
+      "label": "build-performances.mjs",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L1",
+      "id": "scripts_build_performances_mjs",
+      "community": 4,
+      "norm_label": "build-performances.mjs"
+    },
+    {
+      "label": "fail()",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L12",
+      "id": "build_performances_fail",
+      "community": 4,
+      "norm_label": "fail()"
+    },
+    {
+      "label": "assertString()",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L16",
+      "id": "build_performances_assertstring",
+      "community": 4,
+      "norm_label": "assertstring()"
+    },
+    {
+      "label": "assertInteger()",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L22",
+      "id": "build_performances_assertinteger",
+      "community": 4,
+      "norm_label": "assertinteger()"
+    },
+    {
+      "label": "normalizeEntry()",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L28",
+      "id": "build_performances_normalizeentry",
+      "community": 4,
+      "norm_label": "normalizeentry()"
+    },
+    {
+      "label": "dedupeEntries()",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L71",
+      "id": "build_performances_dedupeentries",
+      "community": 4,
+      "norm_label": "dedupeentries()"
+    },
+    {
+      "label": "sortEntries()",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L98",
+      "id": "build_performances_sortentries",
+      "community": 4,
+      "norm_label": "sortentries()"
+    },
+    {
+      "label": "main()",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L107",
+      "id": "build_performances_main",
+      "community": 4,
+      "norm_label": "main()"
+    },
+    {
+      "label": "watch-performances.mjs",
+      "file_type": "code",
+      "source_file": "scripts/watch-performances.mjs",
+      "source_location": "L1",
+      "id": "scripts_watch_performances_mjs",
+      "community": 7,
+      "norm_label": "watch-performances.mjs"
+    },
+    {
+      "label": "runBuild()",
+      "file_type": "code",
+      "source_file": "scripts/watch-performances.mjs",
+      "source_location": "L11",
+      "id": "watch_performances_runbuild",
+      "community": 7,
+      "norm_label": "runbuild()"
+    },
+    {
+      "label": "App.tsx",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L1",
+      "id": "src_app_tsx",
+      "community": 1,
+      "norm_label": "app.tsx"
+    },
+    {
+      "label": "formatTime()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L40",
+      "id": "app_formattime",
+      "community": 1,
+      "norm_label": "formattime()"
+    },
+    {
+      "label": "timeLabel()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L49",
+      "id": "app_timelabel",
+      "community": 1,
+      "norm_label": "timelabel()"
+    },
+    {
+      "label": "videoParams()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L55",
+      "id": "app_videoparams",
+      "community": 1,
+      "norm_label": "videoparams()"
+    },
+    {
+      "label": "prepareQuery()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L92",
+      "id": "app_preparequery",
+      "community": 1,
+      "norm_label": "preparequery()"
+    },
+    {
+      "label": "initializeApp()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L106",
+      "id": "app_initializeapp",
+      "community": 1,
+      "norm_label": "initializeapp()"
+    },
+    {
+      "label": "loadData()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L187",
+      "id": "app_loaddata",
+      "community": 1,
+      "norm_label": "loaddata()"
+    },
+    {
+      "label": "onDown()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L243",
+      "id": "app_ondown",
+      "community": 1,
+      "norm_label": "ondown()"
+    },
+    {
+      "label": "onMove()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L250",
+      "id": "app_onmove",
+      "community": 1,
+      "norm_label": "onmove()"
+    },
+    {
+      "label": "onUp()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L255",
+      "id": "app_onup",
+      "community": 1,
+      "norm_label": "onup()"
+    },
+    {
+      "label": "selectEntry()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L308",
+      "id": "app_selectentry",
+      "community": 1,
+      "norm_label": "selectentry()"
+    },
+    {
+      "label": "runDiceRoll()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L318",
+      "id": "app_rundiceroll",
+      "community": 1,
+      "norm_label": "rundiceroll()"
+    },
+    {
+      "label": "rollDice()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L334",
+      "id": "app_rolldice",
+      "community": 1,
+      "norm_label": "rolldice()"
+    },
+    {
+      "label": "byDate()",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "L343",
+      "id": "app_bydate",
+      "community": 1,
+      "norm_label": "bydate()"
+    },
+    {
+      "label": "main.tsx",
+      "file_type": "code",
+      "source_file": "src/main.tsx",
+      "source_location": "L1",
+      "id": "src_main_tsx",
+      "community": 0,
+      "norm_label": "main.tsx"
+    },
+    {
+      "label": "vite.config.ts",
+      "file_type": "code",
+      "source_file": "vite.config.ts",
+      "source_location": null,
+      "id": "vite_config",
+      "community": 2,
+      "norm_label": "vite.config.ts"
+    },
+    {
+      "label": "scripts/build-performances.mjs",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": null,
+      "id": "scripts_build_performances",
+      "community": 2,
+      "norm_label": "scripts/build-performances.mjs"
+    },
+    {
+      "label": "scripts/watch-performances.mjs",
+      "file_type": "code",
+      "source_file": "scripts/watch-performances.mjs",
+      "source_location": null,
+      "id": "scripts_watch_performances",
+      "community": 2,
+      "norm_label": "scripts/watch-performances.mjs"
+    },
+    {
+      "label": "App.tsx (main component)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": null,
+      "id": "src_app",
+      "community": 0,
+      "norm_label": "app.tsx (main component)"
+    },
+    {
+      "label": "main.tsx (entry point)",
+      "file_type": "code",
+      "source_file": "src/main.tsx",
+      "source_location": null,
+      "id": "src_main",
+      "community": 2,
+      "norm_label": "main.tsx (entry point)"
+    },
+    {
+      "label": "Performance (data model)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "14-23",
+      "id": "performance_data_model",
+      "community": 3,
+      "norm_label": "performance (data model)"
+    },
+    {
+      "label": "fuseOptions (search config)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "83-89",
+      "id": "fuse_options",
+      "community": 0,
+      "norm_label": "fuseoptions (search config)"
+    },
+    {
+      "label": "byDate (sorting comparator)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "343-349",
+      "id": "by_date_comparator",
+      "community": 5,
+      "norm_label": "bydate (sorting comparator)"
+    },
+    {
+      "label": "normalizeEntry (build validator)",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "28-69",
+      "id": "normalize_entry",
+      "community": 5,
+      "norm_label": "normalizeentry (build validator)"
+    },
+    {
+      "label": "dedupeEntries (build dedup)",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "71-96",
+      "id": "dedupe_entries",
+      "community": 5,
+      "norm_label": "dedupeentries (build dedup)"
+    },
+    {
+      "label": "sortEntries (build sorter)",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "98-105",
+      "id": "sort_entries",
+      "community": 5,
+      "norm_label": "sortentries (build sorter)"
+    },
+    {
+      "label": "loadData (runtime fetch)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "187-226",
+      "id": "load_data",
+      "community": 0,
+      "norm_label": "loaddata (runtime fetch)"
+    },
+    {
+      "label": "selectEntry (song selection)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "308-316",
+      "id": "select_entry",
+      "community": 0,
+      "norm_label": "selectentry (song selection)"
+    },
+    {
+      "label": "seedQueryEffect (URL param seeding)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "279-282",
+      "id": "seed_query_effect",
+      "community": 6,
+      "norm_label": "seedqueryeffect (url param seeding)"
+    },
+    {
+      "label": "YouTube IFrame API integration",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "182-184",
+      "id": "youtube_iframe_api",
+      "community": 0,
+      "norm_label": "youtube iframe api integration"
+    },
+    {
+      "label": "Search bar (UI component)",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "386-417",
+      "id": "ui_search_bar",
+      "community": 0,
+      "norm_label": "search bar (ui component)"
+    },
+    {
+      "label": "Results panel (UI layout)",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "418-471",
+      "id": "ui_results_panel",
+      "community": 3,
+      "norm_label": "results panel (ui layout)"
+    },
+    {
+      "label": "Player panel (UI layout)",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "476-495",
+      "id": "ui_player_panel",
+      "community": 0,
+      "norm_label": "player panel (ui layout)"
+    },
+    {
+      "label": "Time badge (display)",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "466",
+      "id": "ui_time_badge",
+      "community": 0,
+      "norm_label": "time badge (display)"
+    },
+    {
+      "label": "timeLabel (time formatting)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "49-53",
+      "id": "time_label_fn",
+      "community": 0,
+      "norm_label": "timelabel (time formatting)"
+    },
+    {
+      "label": "Drag-to-resize handle",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "236-271",
+      "id": "drag_resize_handle",
+      "community": 0,
+      "norm_label": "drag-to-resize handle"
+    },
+    {
+      "label": "Performance data loader",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "103-226",
+      "id": "performance_data_loader",
+      "community": 3,
+      "norm_label": "performance data loader"
+    },
+    {
+      "label": "Members-only filtering",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "112",
+      "id": "members_only_filter",
+      "community": 3,
+      "norm_label": "members-only filtering"
+    },
+    {
+      "label": "Build pipeline (data pipeline)",
+      "file_type": "document",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "107-133",
+      "id": "build_pipeline",
+      "community": 2,
+      "norm_label": "build pipeline (data pipeline)"
+    },
+    {
+      "label": "performances.json (source data)",
+      "file_type": "document",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "6",
+      "id": "performances_json_source",
+      "community": 2,
+      "norm_label": "performances.json (source data)"
+    },
+    {
+      "label": "performances.min.json (output)",
+      "file_type": "document",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "7",
+      "id": "performances_min_json",
+      "community": 3,
+      "norm_label": "performances.min.json (output)"
+    },
+    {
+      "label": "performances.fuse-index.json (output)",
+      "file_type": "document",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "8",
+      "id": "performances_fuse_index_json",
+      "community": 3,
+      "norm_label": "performances.fuse-index.json (output)"
+    },
+    {
+      "label": "URL param system (permalinks)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": "41-46",
+      "id": "url_param_system",
+      "community": 6,
+      "norm_label": "url param system (permalinks)"
+    },
+    {
+      "label": "Seeded initial state logic",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "116-144",
+      "id": "seeded_initial_state",
+      "community": 6,
+      "norm_label": "seeded initial state logic"
+    },
+    {
+      "label": "Dice roll randomizer",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "334-341",
+      "id": "roll_dice",
+      "community": 0,
+      "norm_label": "dice roll randomizer"
+    },
+    {
+      "label": "Fuse.js build-time index creation",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "118",
+      "id": "fuse_build_index",
+      "community": 3,
+      "norm_label": "fuse.js build-time index creation"
+    },
+    {
+      "label": "README.md (project docs)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "readme_project",
+      "community": 2,
+      "norm_label": "readme.md (project docs)"
+    },
+    {
+      "label": "CLAUDE.md (project docs)",
+      "file_type": "document",
+      "source_file": "CLAUDE.md",
+      "source_location": null,
+      "id": "claudefile_project",
+      "community": 2,
+      "norm_label": "claude.md (project docs)"
+    },
+    {
+      "label": "TODO.md (project tracker)",
+      "file_type": "document",
+      "source_file": "TODO.md",
+      "source_location": null,
+      "id": "todo_project",
+      "community": 3,
+      "norm_label": "todo.md (project tracker)"
+    },
+    {
+      "label": "Kannaoke (project)",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": null,
+      "id": "kannaoke_project",
+      "community": 9,
+      "norm_label": "kannaoke (project)"
+    },
+    {
+      "label": "fuse.js (npm dependency)",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "2",
+      "id": "fuse_js_dep",
+      "community": 0,
+      "norm_label": "fuse.js (npm dependency)"
+    },
+    {
+      "label": "@tabler/icons-react (npm dep)",
+      "file_type": "document",
+      "source_file": "src/App.tsx",
+      "source_location": "5-7",
+      "id": "tabler_icons_dep",
+      "community": 0,
+      "norm_label": "@tabler/icons-react (npm dep)"
+    },
+    {
+      "label": "Cloudflare Workers hosting",
+      "file_type": "document",
+      "source_file": "README.md",
+      "source_location": "9",
+      "id": "cloudflare_worker_hosting",
+      "community": 2,
+      "norm_label": "cloudflare workers hosting"
+    },
+    {
+      "label": "watch-performances.mjs (watch script)",
+      "file_type": "code",
+      "source_file": "scripts/watch-performances.mjs",
+      "source_location": null,
+      "id": "watch_build_performances",
+      "community": 10,
+      "norm_label": "watch-performances.mjs (watch script)"
+    },
+    {
+      "label": "main() (build script entry)",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "107-133",
+      "id": "build_main_fn",
+      "community": 5,
+      "norm_label": "main() (build script entry)"
+    },
+    {
+      "label": "runBuild() (watch script trigger)",
+      "file_type": "code",
+      "source_file": "scripts/watch-performances.mjs",
+      "source_location": "11-30",
+      "id": "run_build_fn",
+      "community": 11,
+      "norm_label": "runbuild() (watch script trigger)"
+    },
+    {
+      "label": "videoParams() (YouTube params)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "55-62",
+      "id": "video_params_fn",
+      "community": 0,
+      "norm_label": "videoparams() (youtube params)"
+    },
+    {
+      "label": "membersOnly field (data model)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "22",
+      "id": "members_only_field",
+      "community": 3,
+      "norm_label": "membersonly field (data model)"
+    },
+    {
+      "label": "prepareQuery() (query prep)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "92-101",
+      "id": "prepare_query_fn",
+      "community": 12,
+      "norm_label": "preparequery() (query prep)"
+    },
+    {
+      "label": "formatTime() (time format)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "40-47",
+      "id": "format_time_fn",
+      "community": 0,
+      "norm_label": "formattime() (time format)"
+    },
+    {
+      "label": "initializeApp() (initial state)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "106-185",
+      "id": "initial_state_logic",
+      "community": 0,
+      "norm_label": "initializeapp() (initial state)"
+    },
+    {
+      "label": "Query-URL sync (bidirectional)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "285-296",
+      "id": "seed_query_url_sync",
+      "community": 6,
+      "norm_label": "query-url sync (bidirectional)"
+    },
+    {
+      "label": "Active entry-URL sync (bidirectional)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": "299-306",
+      "id": "active_entry_url_sync",
+      "community": 6,
+      "norm_label": "active entry-url sync (bidirectional)"
+    },
+    {
+      "label": "viteConfig (AST node)",
+      "file_type": "code",
+      "source_file": "vite.config.ts",
+      "source_location": null,
+      "id": "ast_vite_config",
+      "community": 13,
+      "norm_label": "viteconfig (ast node)"
+    },
+    {
+      "label": "build-performances.mjs (AST node)",
+      "file_type": "code",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": null,
+      "id": "ast_scripts_build",
+      "community": 14,
+      "norm_label": "build-performances.mjs (ast node)"
+    },
+    {
+      "label": "watch-performances.mjs (AST node)",
+      "file_type": "code",
+      "source_file": "scripts/watch-performances.mjs",
+      "source_location": null,
+      "id": "ast_scripts_watch",
+      "community": 15,
+      "norm_label": "watch-performances.mjs (ast node)"
+    },
+    {
+      "label": "App.tsx (AST node)",
+      "file_type": "code",
+      "source_file": "src/App.tsx",
+      "source_location": null,
+      "id": "ast_src_app",
+      "community": 16,
+      "norm_label": "app.tsx (ast node)"
+    },
+    {
+      "label": "main.tsx (AST node)",
+      "file_type": "code",
+      "source_file": "src/main.tsx",
+      "source_location": null,
+      "id": "ast_src_main",
+      "community": 17,
+      "norm_label": "main.tsx (ast node)"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "scripts_build_performances_mjs",
+      "_tgt": "build_performances_fail",
+      "source": "scripts_build_performances_mjs",
+      "target": "build_performances_fail",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L16",
+      "weight": 1.0,
+      "_src": "scripts_build_performances_mjs",
+      "_tgt": "build_performances_assertstring",
+      "source": "scripts_build_performances_mjs",
+      "target": "build_performances_assertstring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "scripts_build_performances_mjs",
+      "_tgt": "build_performances_assertinteger",
+      "source": "scripts_build_performances_mjs",
+      "target": "build_performances_assertinteger",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "scripts_build_performances_mjs",
+      "_tgt": "build_performances_normalizeentry",
+      "source": "scripts_build_performances_mjs",
+      "target": "build_performances_normalizeentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_src": "scripts_build_performances_mjs",
+      "_tgt": "build_performances_dedupeentries",
+      "source": "scripts_build_performances_mjs",
+      "target": "build_performances_dedupeentries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L98",
+      "weight": 1.0,
+      "_src": "scripts_build_performances_mjs",
+      "_tgt": "build_performances_sortentries",
+      "source": "scripts_build_performances_mjs",
+      "target": "build_performances_sortentries",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L107",
+      "weight": 1.0,
+      "_src": "scripts_build_performances_mjs",
+      "_tgt": "build_performances_main",
+      "source": "scripts_build_performances_mjs",
+      "target": "build_performances_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L18",
+      "weight": 1.0,
+      "_src": "build_performances_assertstring",
+      "_tgt": "build_performances_fail",
+      "source": "build_performances_fail",
+      "target": "build_performances_assertstring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "build_performances_assertinteger",
+      "_tgt": "build_performances_fail",
+      "source": "build_performances_fail",
+      "target": "build_performances_assertinteger",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "build_performances_normalizeentry",
+      "_tgt": "build_performances_fail",
+      "source": "build_performances_fail",
+      "target": "build_performances_normalizeentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L111",
+      "weight": 1.0,
+      "_src": "build_performances_main",
+      "_tgt": "build_performances_fail",
+      "source": "build_performances_fail",
+      "target": "build_performances_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "build_performances_normalizeentry",
+      "_tgt": "build_performances_assertstring",
+      "source": "build_performances_assertstring",
+      "target": "build_performances_normalizeentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L37",
+      "weight": 1.0,
+      "_src": "build_performances_normalizeentry",
+      "_tgt": "build_performances_assertinteger",
+      "source": "build_performances_assertinteger",
+      "target": "build_performances_normalizeentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L115",
+      "weight": 1.0,
+      "_src": "build_performances_main",
+      "_tgt": "build_performances_dedupeentries",
+      "source": "build_performances_dedupeentries",
+      "target": "build_performances_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/build-performances.mjs",
+      "source_location": "L116",
+      "weight": 1.0,
+      "_src": "build_performances_main",
+      "_tgt": "build_performances_sortentries",
+      "source": "build_performances_sortentries",
+      "target": "build_performances_main",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/watch-performances.mjs",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "scripts_watch_performances_mjs",
+      "_tgt": "watch_performances_runbuild",
+      "source": "scripts_watch_performances_mjs",
+      "target": "watch_performances_runbuild",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_formattime",
+      "source": "src_app_tsx",
+      "target": "app_formattime",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L49",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_timelabel",
+      "source": "src_app_tsx",
+      "target": "app_timelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_videoparams",
+      "source": "src_app_tsx",
+      "target": "app_videoparams",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L92",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_preparequery",
+      "source": "src_app_tsx",
+      "target": "app_preparequery",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L106",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_initializeapp",
+      "source": "src_app_tsx",
+      "target": "app_initializeapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L187",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_loaddata",
+      "source": "src_app_tsx",
+      "target": "app_loaddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L243",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_ondown",
+      "source": "src_app_tsx",
+      "target": "app_ondown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L250",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_onmove",
+      "source": "src_app_tsx",
+      "target": "app_onmove",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L255",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_onup",
+      "source": "src_app_tsx",
+      "target": "app_onup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L308",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_selectentry",
+      "source": "src_app_tsx",
+      "target": "app_selectentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L318",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_rundiceroll",
+      "source": "src_app_tsx",
+      "target": "app_rundiceroll",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L334",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_rolldice",
+      "source": "src_app_tsx",
+      "target": "app_rolldice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L343",
+      "weight": 1.0,
+      "_src": "src_app_tsx",
+      "_tgt": "app_bydate",
+      "source": "src_app_tsx",
+      "target": "app_bydate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "app_timelabel",
+      "_tgt": "app_formattime",
+      "source": "app_formattime",
+      "target": "app_timelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L312",
+      "weight": 1.0,
+      "_src": "app_selectentry",
+      "_tgt": "app_videoparams",
+      "source": "app_videoparams",
+      "target": "app_selectentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L131",
+      "weight": 1.0,
+      "_src": "app_initializeapp",
+      "_tgt": "app_preparequery",
+      "source": "app_preparequery",
+      "target": "app_initializeapp",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L141",
+      "weight": 1.0,
+      "_src": "app_initializeapp",
+      "_tgt": "app_rundiceroll",
+      "source": "app_initializeapp",
+      "target": "app_rundiceroll",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L214",
+      "weight": 1.0,
+      "_src": "app_loaddata",
+      "_tgt": "app_initializeapp",
+      "source": "app_initializeapp",
+      "target": "app_loaddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "src/App.tsx",
+      "source_location": "L337",
+      "weight": 1.0,
+      "_src": "app_rolldice",
+      "_tgt": "app_rundiceroll",
+      "source": "app_rundiceroll",
+      "target": "app_rolldice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_src": "src_main_tsx",
+      "_tgt": "src_app",
+      "source": "src_main_tsx",
+      "target": "src_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md:47",
+      "weight": 1.0,
+      "_src": "readme_project",
+      "_tgt": "vite_config",
+      "source": "vite_config",
+      "target": "readme_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "scripts_build_performances",
+      "_tgt": "performances_json_source",
+      "source": "scripts_build_performances",
+      "target": "performances_json_source"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "scripts_build_performances",
+      "_tgt": "performances_min_json",
+      "source": "scripts_build_performances",
+      "target": "performances_min_json"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.85,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "scripts_watch_performances",
+      "_tgt": "scripts_build_performances",
+      "source": "scripts_build_performances",
+      "target": "scripts_watch_performances"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CLAUDE.md:26,73",
+      "weight": 1.0,
+      "_src": "claudefile_project",
+      "_tgt": "scripts_build_performances",
+      "source": "scripts_build_performances",
+      "target": "claudefile_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/watch-performances.mjs",
+      "weight": 1.0,
+      "_src": "scripts_watch_performances",
+      "_tgt": "performances_json_source",
+      "source": "scripts_watch_performances",
+      "target": "performances_json_source"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/main.tsx",
+      "weight": 1.0,
+      "_src": "src_main",
+      "_tgt": "src_app",
+      "source": "src_app",
+      "target": "src_main"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "fuse_js_dep",
+      "source": "src_app",
+      "target": "fuse_js_dep"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "tabler_icons_dep",
+      "source": "src_app",
+      "target": "tabler_icons_dep"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "performance_data_model",
+      "source": "src_app",
+      "target": "performance_data_model"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "load_data",
+      "source": "src_app",
+      "target": "load_data"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "select_entry",
+      "source": "src_app",
+      "target": "select_entry"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "fuse_options",
+      "source": "src_app",
+      "target": "fuse_options"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "seed_query_effect",
+      "source": "src_app",
+      "target": "seed_query_effect"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "seeded_initial_state",
+      "source": "src_app",
+      "target": "seeded_initial_state"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "roll_dice",
+      "source": "src_app",
+      "target": "roll_dice"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "video_params_fn",
+      "source": "src_app",
+      "target": "video_params_fn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "time_label_fn",
+      "source": "src_app",
+      "target": "time_label_fn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "format_time_fn",
+      "source": "src_app",
+      "target": "format_time_fn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "initial_state_logic",
+      "source": "src_app",
+      "target": "initial_state_logic"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:182-184",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "youtube_iframe_api",
+      "source": "src_app",
+      "target": "youtube_iframe_api"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/App.tsx:386-417",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "ui_search_bar",
+      "source": "src_app",
+      "target": "ui_search_bar"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/App.tsx:418-471",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "ui_results_panel",
+      "source": "src_app",
+      "target": "ui_results_panel"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/App.tsx:466",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "ui_time_badge",
+      "source": "src_app",
+      "target": "ui_time_badge"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/App.tsx:476-495",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "ui_player_panel",
+      "source": "src_app",
+      "target": "ui_player_panel"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:236-271",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "drag_resize_handle",
+      "source": "src_app",
+      "target": "drag_resize_handle"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "src/App.tsx:112",
+      "weight": 1.0,
+      "_src": "src_app",
+      "_tgt": "members_only_filter",
+      "source": "src_app",
+      "target": "members_only_filter"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CLAUDE.md:69",
+      "weight": 1.0,
+      "_src": "claudefile_project",
+      "_tgt": "src_app",
+      "source": "src_app",
+      "target": "claudefile_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md:50",
+      "weight": 1.0,
+      "_src": "readme_project",
+      "_tgt": "src_app",
+      "source": "src_app",
+      "target": "readme_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md:51",
+      "weight": 1.0,
+      "_src": "readme_project",
+      "_tgt": "src_main",
+      "source": "src_main",
+      "target": "readme_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "src/App.tsx:418-471",
+      "weight": 1.0,
+      "_src": "ui_results_panel",
+      "_tgt": "performance_data_model",
+      "source": "performance_data_model",
+      "target": "ui_results_panel"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs:10,src/App.tsx:84",
+      "weight": 1.0,
+      "_src": "fuse_build_index",
+      "_tgt": "fuse_options",
+      "source": "fuse_options",
+      "target": "fuse_build_index"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/App.tsx:83-89,386-417",
+      "weight": 1.0,
+      "_src": "ui_search_bar",
+      "_tgt": "fuse_options",
+      "source": "fuse_options",
+      "target": "ui_search_bar"
+    },
+    {
+      "relation": "semantically_similar_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "sort_entries",
+      "_tgt": "by_date_comparator",
+      "source": "by_date_comparator",
+      "target": "sort_entries"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "build_main_fn",
+      "_tgt": "normalize_entry",
+      "source": "normalize_entry",
+      "target": "build_main_fn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "build_main_fn",
+      "_tgt": "dedupe_entries",
+      "source": "dedupe_entries",
+      "target": "build_main_fn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "build_main_fn",
+      "_tgt": "sort_entries",
+      "source": "sort_entries",
+      "target": "build_main_fn"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "src/App.tsx:308-316",
+      "weight": 1.0,
+      "_src": "select_entry",
+      "_tgt": "youtube_iframe_api",
+      "source": "select_entry",
+      "target": "youtube_iframe_api"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:312",
+      "weight": 1.0,
+      "_src": "select_entry",
+      "_tgt": "video_params_fn",
+      "source": "select_entry",
+      "target": "video_params_fn"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "CLAUDE.md",
+      "weight": 1.0,
+      "_src": "url_param_system",
+      "_tgt": "seed_query_effect",
+      "source": "seed_query_effect",
+      "target": "url_param_system"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:476-495,182-184",
+      "weight": 1.0,
+      "_src": "ui_player_panel",
+      "_tgt": "youtube_iframe_api",
+      "source": "youtube_iframe_api",
+      "target": "ui_player_panel"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CLAUDE.md:48-50",
+      "weight": 1.0,
+      "_src": "claudefile_project",
+      "_tgt": "youtube_iframe_api",
+      "source": "youtube_iframe_api",
+      "target": "claudefile_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "src/App.tsx:457-464",
+      "weight": 1.0,
+      "_src": "ui_results_panel",
+      "_tgt": "members_only_filter",
+      "source": "ui_results_panel",
+      "target": "members_only_filter"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:236-271,385",
+      "weight": 1.0,
+      "_src": "drag_resize_handle",
+      "_tgt": "ui_results_panel",
+      "source": "ui_results_panel",
+      "target": "drag_resize_handle"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "TODO.md:16-26",
+      "weight": 1.0,
+      "_src": "todo_project",
+      "_tgt": "ui_results_panel",
+      "source": "ui_results_panel",
+      "target": "todo_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "src/App.tsx:236-271,476",
+      "weight": 1.0,
+      "_src": "drag_resize_handle",
+      "_tgt": "ui_player_panel",
+      "source": "ui_player_panel",
+      "target": "drag_resize_handle"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:466",
+      "weight": 1.0,
+      "_src": "ui_time_badge",
+      "_tgt": "time_label_fn",
+      "source": "ui_time_badge",
+      "target": "time_label_fn"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "src/App.tsx:466",
+      "weight": 1.0,
+      "_src": "ui_time_badge",
+      "_tgt": "format_time_fn",
+      "source": "ui_time_badge",
+      "target": "format_time_fn"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "performances_json_source",
+      "_tgt": "performance_data_loader",
+      "source": "performance_data_loader",
+      "target": "performances_json_source"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "performances_min_json",
+      "_tgt": "performance_data_loader",
+      "source": "performance_data_loader",
+      "target": "performances_min_json"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "performances_fuse_index_json",
+      "_tgt": "performance_data_loader",
+      "source": "performance_data_loader",
+      "target": "performances_fuse_index_json"
+    },
+    {
+      "relation": "conceptually_related_to",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "performance_data_loader",
+      "_tgt": "fuse_build_index",
+      "source": "performance_data_loader",
+      "target": "fuse_build_index"
+    },
+    {
+      "relation": "references",
+      "confidence": "INFERRED",
+      "confidence_score": 0.7,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "members_only_filter",
+      "_tgt": "performance_data_loader",
+      "source": "performance_data_loader",
+      "target": "members_only_filter"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "TODO.md:1-8",
+      "weight": 1.0,
+      "_src": "todo_project",
+      "_tgt": "performance_data_loader",
+      "source": "performance_data_loader",
+      "target": "todo_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx",
+      "weight": 1.0,
+      "_src": "members_only_filter",
+      "_tgt": "members_only_field",
+      "source": "members_only_filter",
+      "target": "members_only_field"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "TODO.md:10",
+      "weight": 1.0,
+      "_src": "todo_project",
+      "_tgt": "members_only_filter",
+      "source": "members_only_filter",
+      "target": "todo_project"
+    },
+    {
+      "relation": "shares_data_with",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs:6,107",
+      "weight": 1.0,
+      "_src": "performances_json_source",
+      "_tgt": "build_pipeline",
+      "source": "build_pipeline",
+      "target": "performances_json_source"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CLAUDE.md:26,72-74",
+      "weight": 1.0,
+      "_src": "claudefile_project",
+      "_tgt": "build_pipeline",
+      "source": "build_pipeline",
+      "target": "claudefile_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CLAUDE.md:58-60,76",
+      "weight": 1.0,
+      "_src": "claudefile_project",
+      "_tgt": "performances_json_source",
+      "source": "performances_json_source",
+      "target": "claudefile_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md:56,62-74",
+      "weight": 1.0,
+      "_src": "readme_project",
+      "_tgt": "performances_json_source",
+      "source": "performances_json_source",
+      "target": "readme_project"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "performances_fuse_index_json",
+      "_tgt": "fuse_build_index",
+      "source": "performances_fuse_index_json",
+      "target": "fuse_build_index"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "CLAUDE.md",
+      "weight": 1.0,
+      "_src": "url_param_system",
+      "_tgt": "seeded_initial_state",
+      "source": "url_param_system",
+      "target": "seeded_initial_state"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:285-296",
+      "weight": 1.0,
+      "_src": "url_param_system",
+      "_tgt": "seed_query_url_sync",
+      "source": "url_param_system",
+      "target": "seed_query_url_sync"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/App.tsx:299-306",
+      "weight": 1.0,
+      "_src": "url_param_system",
+      "_tgt": "active_entry_url_sync",
+      "source": "url_param_system",
+      "target": "active_entry_url_sync"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "CLAUDE.md:41-46",
+      "weight": 1.0,
+      "_src": "claudefile_project",
+      "_tgt": "url_param_system",
+      "source": "url_param_system",
+      "target": "claudefile_project"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "TODO.md:6",
+      "weight": 1.0,
+      "_src": "todo_project",
+      "_tgt": "url_param_system",
+      "source": "url_param_system",
+      "target": "todo_project"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs",
+      "weight": 1.0,
+      "_src": "build_main_fn",
+      "_tgt": "fuse_build_index",
+      "source": "fuse_build_index",
+      "target": "build_main_fn"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md:9",
+      "weight": 1.0,
+      "_src": "readme_project",
+      "_tgt": "cloudflare_worker_hosting",
+      "source": "readme_project",
+      "target": "cloudflare_worker_hosting"
+    }
+  ],
+  "hyperedges": [
+    {
+      "id": "build_pipeline_hyper",
+      "label": "Build pipeline: validate-dedupe-sort-index",
+      "nodes": [
+        "build_main_fn",
+        "normalize_entry",
+        "dedupe_entries",
+        "sort_entries",
+        "fuse_build_index"
+      ],
+      "relation": "form",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "scripts/build-performances.mjs"
+    },
+    {
+      "id": "url_param_hyper",
+      "label": "URL param system: bidirectional sync",
+      "nodes": [
+        "seed_query_effect",
+        "seed_query_url_sync",
+        "active_entry_url_sync",
+        "seeded_initial_state"
+      ],
+      "relation": "form",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/App.tsx"
+    },
+    {
+      "id": "ui_layout_hyper",
+      "label": "Two-panel responsive layout",
+      "nodes": [
+        "ui_results_panel",
+        "ui_player_panel",
+        "drag_resize_handle"
+      ],
+      "relation": "implement",
+      "confidence": "INFERRED",
+      "confidence_score": 0.75,
+      "source_file": "src/App.tsx"
+    }
+  ]
+}
