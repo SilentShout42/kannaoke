@@ -110,8 +110,6 @@ export default function App() {
 
       // Filter to public, non-cover videos for random selection
       const publicVideos = data.filter(p => !p.membersOnly && !/cover/i.test(p.videoTitle));
-      const randomPool = publicVideos.length > 0 ? publicVideos : data;
-      const random = randomPool[Math.floor(Math.random() * randomPool.length)];
 
       const urlParams = new URLSearchParams(window.location.search);
       const vParam = urlParams.get('v');
@@ -134,13 +132,9 @@ export default function App() {
         }
       }
 
-      const initial = matched ?? queryRandom ?? random;
-      if (matched) {
+      const initial = matched ?? queryRandom;
+      if (initial) {
         selectEntry(initial, false, false);
-      } else {
-        runDiceRoll(() => {
-          selectEntry(initial, false, false);
-        });
       }
 
     };
@@ -362,7 +356,7 @@ export default function App() {
     <>
       <header>
         <div className="header-title">
-          <h1><a className="home-link" href="/" onClick={e => { e.preventDefault(); setQuery(''); history.pushState(null, '', '/'); }}>Kannaoke</a></h1>
+          <h1><a className="home-link" href="/" onClick={e => { e.preventDefault(); setQuery(''); setActiveEntry(null); setAutoplay(false); history.pushState(null, '', '/'); }}>Kannaoke</a></h1>
           <p className="subtitle">The Kanna Yanagi 🦆🔍 Karaoke Index</p>
         </div>
         <div className="header-actions">
@@ -492,38 +486,64 @@ export default function App() {
         <div className="resize-handle" id="resize-handle" />
 
         <aside className="player-panel" id="player-panel">
-          {activeEntry && (
-            <div className="now-playing">
-              <span className="now-playing-label">Now playing</span>
-              <span className="now-playing-title">{activeEntry.title}</span>
-              <span className="now-playing-artist">{activeEntry.artist}</span>
-              <span className="now-playing-stream">
-                {formatDate(activeEntry.videoDate)} · {activeEntry.videoTitle}
-              </span>
+          {activeEntry ? (
+            <>
+              <div className="now-playing">
+                <span className="now-playing-label">Now playing</span>
+                <span className="now-playing-title">{activeEntry.title}</span>
+                <span className="now-playing-artist">{activeEntry.artist}</span>
+                <span className="now-playing-stream">
+                  {formatDate(activeEntry.videoDate)} · {activeEntry.videoTitle}
+                </span>
+              </div>
+              <div className="yt-wrapper">
+                <div className="yt-container">
+                  {autoplay ? (
+                    <iframe
+                      key={`${activeEntry.videoId}-${activeEntry.startTime}`}
+                      src={`https://www.youtube-nocookie.com/embed/${activeEntry.videoId}?autoplay=1&start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
+                      title={activeEntry.title}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <LiteYouTubeEmbed
+                      key={`${activeEntry.videoId}-${activeEntry.startTime}`}
+                      id={activeEntry.videoId}
+                      title={activeEntry.title}
+                      noCookie={true}
+                      poster="maxresdefault"
+                      params={`start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
+                    />
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="landing">
+              <h2 className="landing-heading">Kanna Yanagi Karaoke Index</h2>
+              <p className="landing-desc">
+                Search{performances.length > 0 ? ` ${performances.length.toLocaleString()}` : ''} songs
+                from Kanna Yanagi's karaoke streams, jump to any timestamp, and watch clips in an
+                embedded player.
+              </p>
+              <ul className="landing-features">
+                <li>
+                  Fuzzy search by song title or artist: try{' '}
+                  {['enka', 'nier', 'cover', 'alan wake', 'shady'].map(term => (
+                    <button key={term} className="landing-example" onClick={() => setQuery(term)}>
+                      {term}
+                    </button>
+                  ))}
+                </li>
+                <li>Scroll through the song list and click any song to jump to it</li>
+                <li>Light and dark themes</li>
+              </ul>
+              <button className="landing-random-btn" onClick={rollDice}>
+                Pick a random song
+              </button>
             </div>
           )}
-          <div className="yt-wrapper">
-            <div className="yt-container">
-              {activeEntry && (autoplay ? (
-                <iframe
-                  key={`${activeEntry.videoId}-${activeEntry.startTime}`}
-                  src={`https://www.youtube-nocookie.com/embed/${activeEntry.videoId}?autoplay=1&start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
-                  title={activeEntry.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
-              ) : (
-                <LiteYouTubeEmbed
-                  key={`${activeEntry.videoId}-${activeEntry.startTime}`}
-                  id={activeEntry.videoId}
-                  title={activeEntry.title}
-                  noCookie={true}
-                  poster="maxresdefault"
-                  params={`start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
-                />
-              ))}
-            </div>
-          </div>
         </aside>
       </main>
     </>

@@ -493,6 +493,86 @@ main {
   margin-top: 0.125rem;
 }
 
+/* Landing page */
+.landing {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 2rem;
+  max-width: 480px;
+}
+
+.landing-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.landing-desc {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.landing-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.landing-features li {
+  color: var(--text-faint);
+  font-size: 0.875rem;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.landing-features li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--accent-dim);
+}
+
+.landing-example {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  padding: 0.1rem 0.4rem;
+  margin: 0 0.15rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.landing-example:hover {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+}
+
+.landing-random-btn {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.landing-random-btn:hover {
+  border-color: var(--accent-dim);
+  color: var(--accent);
+}
+
 /* YouTube embed container */
 .yt-wrapper {
   flex: 1;

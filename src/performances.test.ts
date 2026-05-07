@@ -5,7 +5,7 @@ import Ajv from 'ajv';
 
 const source = JSON.parse(readFileSync(resolve(__dirname, '../public/performances.json'), 'utf8'));
 const schema = JSON.parse(readFileSync(resolve(__dirname, '../scripts/performances.schema.json'), 'utf8'));
-const data: unknown[] = source.performances;
+const data: { videoId: string; startTime: number; endTime?: number | null; videoDate: string; title: string }[] = source.performances;
 
 const ajv = new Ajv({ allErrors: true });
 const validate = ajv.compile(schema);
