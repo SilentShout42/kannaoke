@@ -42,21 +42,27 @@ export default {
   },
 };
 
+const performancesCache = new WeakMap<Env['ASSETS'], Performance[]>();
+
 async function findEntry(
   env: Env,
   origin: string,
   videoId: string,
   startTime: number,
 ): Promise<Performance | null> {
-  const resp = await env.ASSETS.fetch(new Request(`${origin}/performances.min.json`));
-  if (!resp.ok) return null;
-  const ct = resp.headers.get('Content-Type') ?? '';
-  if (!ct.includes('json')) {
-    console.log(JSON.stringify({ event: 'assets_non_json', status: resp.status, ct }));
-    return null;
+  let data = performancesCache.get(env.ASSETS);
+  if (!data) {
+    const resp = await env.ASSETS.fetch(new Request(`${origin}/performances.min.json`));
+    if (!resp.ok) return null;
+    const ct = resp.headers.get('Content-Type') ?? '';
+    if (!ct.includes('json')) {
+      console.log(JSON.stringify({ event: 'assets_non_json', status: resp.status, ct }));
+      return null;
+    }
+    data = await resp.json();
+    performancesCache.set(env.ASSETS, data!);
   }
-  const data: Performance[] = await resp.json();
-  return data.find((p) => p.videoId === videoId && p.startTime === startTime) ?? null;
+  return data!.find((p) => p.videoId === videoId && p.startTime === startTime) ?? null;
 }
 
 export function injectMeta(html: string, meta: { title: string; description: string; url: string }): string {
