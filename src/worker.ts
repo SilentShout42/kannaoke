@@ -29,7 +29,12 @@ export default {
           url: pageUrl,
         });
         return new Response(modified, {
-          headers: { 'Content-Type': 'text/html;charset=UTF-8' },
+          headers: {
+            'Content-Type': 'text/html;charset=UTF-8',
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'SAMEORIGIN',
+            'Referrer-Policy': 'strict-origin-when-cross-origin',
+          },
         });
       }
     }
@@ -80,5 +85,6 @@ export function escHtml(s: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
