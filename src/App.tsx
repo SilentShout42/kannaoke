@@ -6,6 +6,8 @@ import {
   IconDice4Filled, IconDice5Filled, IconDice6Filled, IconDiscFilled, IconLockSquareRoundedFilled, IconX,
   IconSun, IconMoon, IconMailHeart,
 } from '@tabler/icons-react';
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
 import { formatDate } from './formatDate';
 
@@ -25,31 +27,6 @@ interface Performance {
   membersOnly: boolean;
 }
 
-declare global {
-  interface Window {
-    YT: {
-      Player: new (el: string, opts: unknown) => YTPlayer;
-      PlayerState: Record<string, number>;
-    };
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
-
-interface YTPlayer {
-  loadVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
-  cueVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
-}
-
-
-
-function videoParams(entry: Performance) {
-  const p: { videoId: string; startSeconds: number; endSeconds?: number } = {
-    videoId: entry.videoId,
-    startSeconds: entry.startTime,
-  };
-  if (entry.endTime != null) p.endSeconds = entry.endTime;
-  return p;
-}
 
 export default function App() {
   const [performances, setPerformances] = useState<Performance[]>([]);
@@ -58,9 +35,6 @@ export default function App() {
 
 
   const fuseRef = useRef<Fuse<Performance> | null>(null);
-  const ytPlayerRef = useRef<YTPlayer | null>(null);
-  const ytReadyRef = useRef(false);
-  const pendingRef = useRef<Performance | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -91,6 +65,7 @@ export default function App() {
       list.scrollTo({ top, behavior: 'smooth' });
     });
   };
+  const [autoplay, setAutoplay] = useState(false);
   const [diceIndex, setDiceIndex] = useState(0);
   const [rolling, setRolling] = useState(false);
   const rollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -160,50 +135,13 @@ export default function App() {
 
       const initial = matched ?? queryRandom ?? random;
       if (matched) {
-        setActiveEntry(initial);
+        selectEntry(initial, false);
       } else {
         runDiceRoll(() => {
-          setActiveEntry(initial);
+          selectEntry(initial, false);
         });
       }
 
-      window.onYouTubeIframeAPIReady = () => {
-        const entry = pendingRef.current ?? initial;
-        pendingRef.current = null;
-        const playerVars: Record<string, unknown> = {
-          rel: 0,
-          modestbranding: 1,
-          playsinline: 1,
-          start: entry.startTime,
-        };
-        if (entry.endTime != null) playerVars.end = entry.endTime;
-        ytPlayerRef.current = new window.YT.Player('yt-player', {
-          videoId: entry.videoId,
-          playerVars,
-          events: {
-            onReady() {
-              ytReadyRef.current = true;
-              setRolling(false);
-                            if (pendingRef.current) {
-                ytPlayerRef.current!.loadVideoById(videoParams(pendingRef.current));
-                pendingRef.current = null;
-              }
-            },
-            onStateChange({ data }: { data: number }) {
-              const { PLAYING, PAUSED, ENDED, CUED, BUFFERING } = window.YT.PlayerState;
-              if ([BUFFERING, CUED].includes(data)) {
-                setRolling(false);
-              }
-              if ([PLAYING, PAUSED, ENDED, CUED].includes(data)) {
-                              }
-            },
-          },
-        });
-      };
-
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      document.head.appendChild(tag);
     };
 
     const loadData = async () => {
@@ -339,13 +277,9 @@ export default function App() {
     if (window.location.search !== next) history.replaceState(null, '', next);
   }, [activeEntry]);
 
-  function selectEntry(entry: Performance) {
+  function selectEntry(entry: Performance, play = true) {
+    setAutoplay(play);
     setActiveEntry(entry);
-    if (ytReadyRef.current) {
-      ytPlayerRef.current!.loadVideoById(videoParams(entry));
-    } else {
-      pendingRef.current = entry;
-    }
   }
 
   function runDiceRoll(onComplete: () => void) {
@@ -359,6 +293,7 @@ export default function App() {
       if (ticks >= total) {
         clearInterval(rollIntervalRef.current!);
         rollIntervalRef.current = null;
+        setRolling(false);
         onComplete();
       }
     }, 60);
@@ -540,7 +475,24 @@ export default function App() {
           )}
           <div className="yt-wrapper">
             <div className="yt-container">
-              <div id="yt-player" />
+              {activeEntry && (autoplay ? (
+                <iframe
+                  key={`${activeEntry.videoId}-${activeEntry.startTime}`}
+                  src={`https://www.youtube-nocookie.com/embed/${activeEntry.videoId}?autoplay=1&start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
+                  title={activeEntry.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              ) : (
+                <LiteYouTubeEmbed
+                  key={`${activeEntry.videoId}-${activeEntry.startTime}`}
+                  id={activeEntry.videoId}
+                  title={activeEntry.title}
+                  noCookie={true}
+                  poster="maxresdefault"
+                  params={`start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
+                />
+              ))}
             </div>
           </div>
         </aside>

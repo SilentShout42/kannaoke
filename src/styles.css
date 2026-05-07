@@ -493,7 +493,7 @@ main {
   margin-top: 0.125rem;
 }
 
-/* YouTube iframe container */
+/* YouTube embed container */
 .yt-wrapper {
   flex: 1;
   min-height: 0;
@@ -511,10 +511,19 @@ main {
   background: #000;
 }
 
+.yt-container .yt-lite,
+.yt-container .yt-lite > iframe {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border: none;
+}
+
 .yt-container iframe {
   width: 100%;
   height: 100%;
   display: block;
+  border: none;
 }
 
 
