@@ -270,6 +270,11 @@ export default function App() {
     if (q) setQuery(q);
   }, []);
 
+  // Scroll results to top on new search
+  useEffect(() => {
+    if (query.trim()) resultsRef.current?.scrollTo({ top: 0 });
+  }, [query]);
+
   // Sync query → URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
