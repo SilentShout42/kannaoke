@@ -481,13 +481,15 @@ export default function App() {
               </span>
             </div>
           )}
-          <div className="yt-container">
-            <div id="yt-player" />
-            {loadingYT && (
-              <div className="yt-loading">
-                <div className="yt-spinner" />
-              </div>
-            )}
+          <div className="yt-wrapper">
+            <div className="yt-container">
+              <div id="yt-player" />
+              {loadingYT && (
+                <div className="yt-loading">
+                  <div className="yt-spinner" />
+                </div>
+              )}
+            </div>
           </div>
         </aside>
       </main>

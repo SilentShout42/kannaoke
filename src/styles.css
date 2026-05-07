@@ -10,8 +10,6 @@
   --text-muted: #8a80a0;
   --text-faint: #5a5270;
   --song-list-width: 420px;
-  /* header ~80px + player padding 2*1.25rem + now-playing ~100px + gap 0.875rem */
-  --video-max-h: calc(100vh - 250px);
 }
 
 *,
@@ -79,9 +77,12 @@ header .subtitle {
   cursor: pointer;
   color: var(--text-faint);
   padding: 0.25rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   border-radius: 6px;
   display: flex;
   align-items: center;
+  justify-content: center;
   transition: color 0.15s;
 }
 
@@ -208,8 +209,6 @@ main {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-y: overlay;
-  /* overlay scrollbar so content stays flush with the divider */
   overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
@@ -316,14 +315,6 @@ main {
   color: var(--text-muted);
 }
 
-.time-badge {
-  font-size: 0.75rem;
-  color: var(--text-faint);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
 .no-results {
   padding: 3rem 1.5rem;
   text-align: center;
@@ -394,10 +385,17 @@ main {
 }
 
 /* YouTube iframe container */
+.yt-wrapper {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+}
+
 .yt-container {
   position: relative;
   width: 100%;
-  max-width: calc(var(--video-max-h) * 16 / 9);
+  max-height: 100%;
   aspect-ratio: 16 / 9;
   border-radius: 8px;
   overflow: hidden;
