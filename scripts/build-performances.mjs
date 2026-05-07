@@ -107,11 +107,12 @@ function sortEntries(entries) {
 async function main() {
   const rawText = await readFile(SOURCE_PATH, 'utf8');
   const parsed = JSON.parse(rawText);
-  if (!Array.isArray(parsed)) {
-    fail('performances.json must be a top-level JSON array');
+  const entries = Array.isArray(parsed) ? parsed : parsed?.performances;
+  if (!Array.isArray(entries)) {
+    fail('performances.json must contain a "performances" array');
   }
 
-  const normalized = parsed.map((entry, idx) => normalizeEntry(entry, idx));
+  const normalized = entries.map((entry, idx) => normalizeEntry(entry, idx));
   const { out: deduped, removed } = dedupeEntries(normalized);
   sortEntries(deduped);
 
