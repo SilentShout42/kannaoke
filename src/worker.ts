@@ -29,7 +29,7 @@ export default {
         const pageUrl = `https://kannaoke.oyasumi99.com/?v=${encodeURIComponent(v)}&t=${encodeURIComponent(t)}`;
         const modified = injectMeta(html, {
           title: `${entry.title} — Kannaoke`,
-          description: `${entry.artist} · ${entry.videoDate} · ${entry.videoTitle}`,
+          description: `${entry.artist} · ${entry.videoDate}`,
           url: pageUrl,
         });
         return new Response(modified, {

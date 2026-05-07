@@ -39,20 +39,7 @@ interface YTPlayer {
   cueVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
 }
 
-function formatTime(s: number): string {
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  return h > 0
-    ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`
-    : `${m}:${String(sec).padStart(2, '0')}`;
-}
 
-function timeLabel(e: Performance): string {
-  return e.endTime != null
-    ? `${formatTime(e.startTime)} – ${formatTime(e.endTime)}`
-    : formatTime(e.startTime);
-}
 
 function videoParams(entry: Performance) {
   const p: { videoId: string; startSeconds: number; endSeconds?: number } = {
@@ -443,7 +430,7 @@ export default function App() {
                     <div className="song-title">{entry.title}</div>
                     <div className="song-artist">{entry.artist}</div>
                     <div className="song-stream">
-                      <span className="song-stream-text">{formatDate(entry.videoDate)} · {entry.videoTitle}</span>
+                      <span className="song-stream-text">{formatDate(entry.videoDate)}</span>
                     </div>
                   </div>
                   <div className="result-meta">
@@ -465,7 +452,6 @@ export default function App() {
                         <IconLockSquareRoundedFilled size={24} />
                       </span>
                     )}
-                    <span className="time-badge">{timeLabel(entry)}</span>
                   </div>
                 </li>
               ))

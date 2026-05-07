@@ -90,7 +90,7 @@ describe('escHtml', () => {
 describe('injectMeta', () => {
   const meta = {
     title: 'Song of the Ancients — Kannaoke',
-    description: 'Devola · NieR · 2024-08-03 · Karaoke! Cute Duck Girl Singing for You!',
+    description: 'Devola · NieR · 2024-08-03',
     url: 'https://kannaoke.oyasumi99.com/?v=q71H8SzQYFc&t=7175',
   };
 
@@ -105,7 +105,7 @@ describe('injectMeta', () => {
   });
 
   it('replaces meta description', () => {
-    expect(result).toContain('name="description" content="Devola · NieR · 2024-08-03 · Karaoke! Cute Duck Girl Singing for You!"');
+    expect(result).toContain('name="description" content="Devola · NieR · 2024-08-03"');
   });
 
   it('replaces og:title', () => {
@@ -113,7 +113,7 @@ describe('injectMeta', () => {
   });
 
   it('replaces og:description', () => {
-    expect(result).toContain('property="og:description" content="Devola · NieR · 2024-08-03 · Karaoke! Cute Duck Girl Singing for You!"');
+    expect(result).toContain('property="og:description" content="Devola · NieR · 2024-08-03"');
   });
 
   it('replaces og:url', () => {
@@ -125,7 +125,7 @@ describe('injectMeta', () => {
   });
 
   it('replaces twitter:description', () => {
-    expect(result).toContain('name="twitter:description" content="Devola · NieR · 2024-08-03 · Karaoke! Cute Duck Girl Singing for You!"');
+    expect(result).toContain('name="twitter:description" content="Devola · NieR · 2024-08-03"');
   });
 
   it('escapes special chars in injected values', () => {
@@ -166,7 +166,7 @@ describe('worker fetch handler', () => {
       const resp = await worker.fetch(req, { ASSETS: assets } as never);
       const html = await resp.text();
       expect(html).toContain('<title>Song of the Ancients — Kannaoke</title>');
-      expect(html).toContain('Devola · NieR · 2024-08-03 · Karaoke! Cute Duck Girl Singing for You!');
+      expect(html).toContain('Devola · NieR · 2024-08-03');
     }
   });
 
