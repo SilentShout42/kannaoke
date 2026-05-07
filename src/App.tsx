@@ -6,6 +6,8 @@ import {
   IconDice4Filled, IconDice5Filled, IconDice6Filled, IconDiscFilled, IconLockSquareRoundedFilled, IconX,
 } from '@tabler/icons-react';
 
+import { formatDate } from './formatDate';
+
 const DICE_ICONS = [
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
   IconDice4Filled, IconDice5Filled, IconDice6Filled,
@@ -441,7 +443,7 @@ export default function App() {
                     <div className="song-title">{entry.title}</div>
                     <div className="song-artist">{entry.artist}</div>
                     <div className="song-stream">
-                      <span className="song-stream-text">{entry.videoDate} · {entry.videoTitle}</span>
+                      <span className="song-stream-text">{formatDate(entry.videoDate)} · {entry.videoTitle}</span>
                     </div>
                   </div>
                   <div className="result-meta">
@@ -480,7 +482,7 @@ export default function App() {
               <span className="now-playing-title">{activeEntry.title}</span>
               <span className="now-playing-artist">{activeEntry.artist}</span>
               <span className="now-playing-stream">
-                {activeEntry.videoDate} · {activeEntry.videoTitle}
+                {formatDate(activeEntry.videoDate)} · {activeEntry.videoTitle}
               </span>
             </div>
           )}
