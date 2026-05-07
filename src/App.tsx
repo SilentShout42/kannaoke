@@ -66,6 +66,7 @@ export default function App() {
     });
   };
   const [autoplay, setAutoplay] = useState(false);
+  const pushNextNav = useRef(false);
   const [diceIndex, setDiceIndex] = useState(0);
   const [rolling, setRolling] = useState(false);
   const rollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -135,10 +136,10 @@ export default function App() {
 
       const initial = matched ?? queryRandom ?? random;
       if (matched) {
-        selectEntry(initial, false);
+        selectEntry(initial, false, false);
       } else {
         runDiceRoll(() => {
-          selectEntry(initial, false);
+          selectEntry(initial, false, false);
         });
       }
 
@@ -267,17 +268,45 @@ export default function App() {
     if (current !== expected) history.replaceState(null, '', next);
   }, [query]);
 
-  // Sync active entry → URL
+  // Sync active entry → URL (push for explicit user nav, replace otherwise)
   useEffect(() => {
     if (!activeEntry) return;
     const params = new URLSearchParams(window.location.search);
     params.set('v', activeEntry.videoId);
     params.set('t', String(activeEntry.startTime));
     const next = `?${params.toString()}`;
-    if (window.location.search !== next) history.replaceState(null, '', next);
+    if (window.location.search !== next) {
+      if (pushNextNav.current) {
+        history.pushState(null, '', next);
+      } else {
+        history.replaceState(null, '', next);
+      }
+    }
+    pushNextNav.current = false;
   }, [activeEntry]);
 
-  function selectEntry(entry: Performance, play = true) {
+  // Restore state on browser back/forward
+  useEffect(() => {
+    if (performances.length === 0) return;
+    const onPopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const v = params.get('v');
+      const t = params.get('t');
+      const q = params.get('q') ?? '';
+      setQuery(q);
+      if (v && t) {
+        const entry = performances.find(p => p.videoId === v && p.startTime === Number(t));
+        if (entry) selectEntry(entry, false, false);
+      } else {
+        setActiveEntry(null);
+      }
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, [performances]);
+
+  function selectEntry(entry: Performance, play = true, push = true) {
+    pushNextNav.current = push;
     setAutoplay(play);
     setActiveEntry(entry);
   }
