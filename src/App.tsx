@@ -65,7 +65,16 @@ export default function App() {
   const mainRef = useRef<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
   const resultsRef = useRef<HTMLUListElement | null>(null);
+  const scrollWrapRef = useRef<HTMLDivElement | null>(null);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const updateScrollFade = () => {
+    const el = resultsRef.current;
+    const wrap = scrollWrapRef.current;
+    if (!el || !wrap) return;
+    wrap.classList.toggle('has-top', el.scrollTop > 0);
+    wrap.classList.toggle('has-bottom', el.scrollTop + el.clientHeight < el.scrollHeight - 1);
+  };
   const [diceIndex, setDiceIndex] = useState(0);
   const [rolling, setRolling] = useState(false);
   const rollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -372,6 +381,9 @@ export default function App() {
       .map(r => r.item)
     : [...performances].sort(byDate);
 
+  // Re-evaluate fade after every list change (data load, query, scroll-to-center)
+  useEffect(() => { updateScrollFade(); });
+
   return (
     <>
       <header>
@@ -437,6 +449,7 @@ export default function App() {
                 : ''}
             </span>
           </div>
+          <div className="results-scroll-wrap" ref={scrollWrapRef}>
           <ul
             id="results"
             role="list"
@@ -447,6 +460,7 @@ export default function App() {
               el.classList.add('is-scrolling');
               if (scrollTimerRef.current) clearTimeout(scrollTimerRef.current);
               scrollTimerRef.current = setTimeout(() => el.classList.remove('is-scrolling'), 1000);
+              updateScrollFade();
             }}
           >
             {sorted.length === 0 ? (
@@ -490,6 +504,7 @@ export default function App() {
               ))
             )}
           </ul>
+          </div>
         </section>
 
         <div className="resize-handle" id="resize-handle" />

@@ -239,10 +239,42 @@ main {
   border-right: 1px solid var(--border);
 }
 
-#results {
-  list-style: none;
+.results-scroll-wrap {
+  position: relative;
   flex: 1;
   min-height: 0;
+  overflow: hidden;
+}
+
+.results-scroll-wrap::before,
+.results-scroll-wrap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3rem;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.results-scroll-wrap::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--bg), transparent);
+}
+
+.results-scroll-wrap::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--bg), transparent);
+}
+
+.results-scroll-wrap.has-top::before { opacity: 1; }
+.results-scroll-wrap.has-bottom::after { opacity: 1; }
+
+#results {
+  list-style: none;
+  height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
