@@ -13,19 +13,14 @@ interface Performance {
   endTime?: number | null;
 }
 
-const BOT_UA =
-  /discord|twitterbot|facebookexternalhit|telegrambot|slackbot|linkedinbot|whatsapp|googlebot|bingbot/i;
-
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const v = url.searchParams.get('v');
     const t = url.searchParams.get('t');
-    const ua = request.headers.get('User-Agent') ?? '';
 
-    if (v && t && BOT_UA.test(ua)) {
+    if (v && t) {
       const startTime = parseInt(t, 10);
-      console.log(JSON.stringify({ event: 'bot_request', v, t, origin: url.origin, ua }));
       const entry = await findEntry(env, url.origin, v, startTime);
       console.log(JSON.stringify({ event: 'entry_lookup', v, t, found: !!entry, title: entry?.title }));
       if (entry) {
@@ -55,6 +50,11 @@ async function findEntry(
 ): Promise<Performance | null> {
   const resp = await env.ASSETS.fetch(new Request(`${origin}/performances.min.json`));
   if (!resp.ok) return null;
+  const ct = resp.headers.get('Content-Type') ?? '';
+  if (!ct.includes('json')) {
+    console.log(JSON.stringify({ event: 'assets_non_json', status: resp.status, ct }));
+    return null;
+  }
   const data: Performance[] = await resp.json();
   return data.find((p) => p.videoId === videoId && p.startTime === startTime) ?? null;
 }

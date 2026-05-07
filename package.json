@@ -8,7 +8,7 @@
     "prepare:data:watch": "node scripts/watch-performances.mjs",
     "dev": "npm run prepare:data && (npm run prepare:data:watch & vite)",
     "build": "npm run prepare:data && tsc -b && vite build",
-    "preview": "vite preview",
+    "preview": "npm run build && wrangler dev --config dist/kannaoke/wrangler.json",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "test": "vitest run --config vitest.config.ts"
