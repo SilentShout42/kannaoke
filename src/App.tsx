@@ -270,9 +270,13 @@ export default function App() {
     if (q) setQuery(q);
   }, []);
 
-  // Scroll results to top on new search
+  // Scroll results to top on new search; reveal active item when clearing
   useEffect(() => {
-    if (query.trim()) resultsRef.current?.scrollTo({ top: 0 });
+    if (query.trim()) {
+      resultsRef.current?.scrollTo({ top: 0 });
+    } else {
+      document.querySelector('#results .result-item.active')?.scrollIntoView({ block: 'nearest' });
+    }
   }, [query]);
 
   // Sync query → URL
