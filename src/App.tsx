@@ -75,6 +75,20 @@ export default function App() {
     wrap.classList.toggle('has-top', el.scrollTop > 0);
     wrap.classList.toggle('has-bottom', el.scrollTop + el.clientHeight < el.scrollHeight - 1);
   };
+
+  const scrollActiveToSafeZone = () => {
+    const list = resultsRef.current;
+    const item = list?.querySelector<HTMLElement>('.result-item.active');
+    if (!list || !item) return;
+    const fadeH = parseFloat(getComputedStyle(document.documentElement).fontSize) * 3;
+    const itemTop = item.offsetTop - list.scrollTop;
+    const itemBottom = itemTop + item.offsetHeight;
+    if (itemTop >= fadeH && itemBottom <= list.clientHeight - fadeH) return;
+    const top = itemTop < fadeH
+      ? item.offsetTop - fadeH
+      : item.offsetTop + item.offsetHeight - list.clientHeight + fadeH;
+    list.scrollTo({ top, behavior: 'smooth' });
+  };
   const [diceIndex, setDiceIndex] = useState(0);
   const [rolling, setRolling] = useState(false);
   const rollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -278,10 +292,7 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => {
-    document.querySelector('#results .result-item.active')
-      ?.scrollIntoView({ block: 'nearest' });
-  }, [activeEntry]);
+  useEffect(() => { scrollActiveToSafeZone(); }, [activeEntry]);
 
   useEffect(() => {
     document.title = activeEntry
@@ -300,7 +311,7 @@ export default function App() {
     if (query.trim()) {
       resultsRef.current?.scrollTo({ top: 0 });
     } else {
-      document.querySelector('#results .result-item.active')?.scrollIntoView({ block: 'nearest' });
+      scrollActiveToSafeZone();
     }
   }, [query]);
 
