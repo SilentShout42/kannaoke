@@ -55,7 +55,7 @@ export default function App() {
   const [performances, setPerformances] = useState<Performance[]>([]);
   const [query, setQuery] = useState('');
   const [activeEntry, setActiveEntry] = useState<Performance | null>(null);
-  const [loadingYT, setLoadingYT] = useState(false);
+
 
   const fuseRef = useRef<Fuse<Performance> | null>(null);
   const ytPlayerRef = useRef<YTPlayer | null>(null);
@@ -182,8 +182,7 @@ export default function App() {
             onReady() {
               ytReadyRef.current = true;
               setRolling(false);
-              setLoadingYT(false);
-              if (pendingRef.current) {
+                            if (pendingRef.current) {
                 ytPlayerRef.current!.loadVideoById(videoParams(pendingRef.current));
                 pendingRef.current = null;
               }
@@ -194,8 +193,7 @@ export default function App() {
                 setRolling(false);
               }
               if ([PLAYING, PAUSED, ENDED, CUED].includes(data)) {
-                setLoadingYT(false);
-              }
+                              }
             },
           },
         });
@@ -341,7 +339,6 @@ export default function App() {
 
   function selectEntry(entry: Performance) {
     setActiveEntry(entry);
-    setLoadingYT(true);
     if (ytReadyRef.current) {
       ytPlayerRef.current!.loadVideoById(videoParams(entry));
     } else {
@@ -540,11 +537,6 @@ export default function App() {
           <div className="yt-wrapper">
             <div className="yt-container">
               <div id="yt-player" />
-              {loadingYT && (
-                <div className="yt-loading">
-                  <div className="yt-spinner" />
-                </div>
-              )}
             </div>
           </div>
         </aside>

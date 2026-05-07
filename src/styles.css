@@ -261,7 +261,6 @@ main {
   min-width: 180px;
   flex-shrink: 0;
   overflow: hidden;
-  border-right: 1px solid var(--border);
 }
 
 .results-scroll-wrap {
@@ -302,8 +301,13 @@ main {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  scrollbar-width: thin;
+  scrollbar-width: auto;
   scrollbar-color: transparent transparent;
+  transform: scaleX(-1);
+}
+
+#results > * {
+  transform: scaleX(-1);
 }
 
 #results:hover,
@@ -334,6 +338,7 @@ main {
 }
 
 .result-item {
+  text-align: left;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -416,15 +421,27 @@ main {
 
 /* Resize handle */
 .resize-handle {
-  width: 4px;
+  width: 9px;
   flex-shrink: 0;
   cursor: col-resize;
+  position: relative;
+  margin-left: -4px;
+  z-index: 1;
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
   background: var(--border);
   transition: background 0.15s;
 }
 
-.resize-handle:hover,
-.resize-handle.dragging {
+.resize-handle:hover::after,
+.resize-handle.dragging::after {
   background: var(--accent-dim);
 }
 
@@ -500,34 +517,6 @@ main {
   display: block;
 }
 
-.yt-loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-}
-
-.yt-loading[hidden] {
-  display: none;
-}
-
-.yt-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.15);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.75s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 
 /* Mobile */
 @media (max-width: 768px) {

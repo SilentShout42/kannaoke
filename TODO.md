@@ -1,10 +1,10 @@
 # TODO
 
-- [ ] Up-to-date karaoke timestamps data
+- [x] Up-to-date karaoke timestamps data
 - [ ] Reporting method for incorrect or missing timestamps
 - [x] Include official covers
 - [x] URL param support and permalinking so you can link to specific searches
-- [ ] Different color schemes (at least light & dark mode support), preferably ones keyed to Kanna model palettes
+- [x] Different color schemes (at least light & dark mode support), preferably ones keyed to Kanna model palettes
 - [ ] Easter eggs? 🔍
 - [x] BUG: Intermittent "live event has ended" player state
 - [x] membersOnly flags to filter out for random + initial load
