@@ -4,7 +4,7 @@ import type { IFuseOptions } from 'fuse.js';
 import {
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
   IconDice4Filled, IconDice5Filled, IconDice6Filled, IconDiscFilled, IconLockSquareRoundedFilled, IconX,
-  IconSun, IconMoon,
+  IconSun, IconMoon, IconMailHeart,
 } from '@tabler/icons-react';
 
 import { formatDate } from './formatDate';
@@ -398,32 +398,38 @@ export default function App() {
   return (
     <>
       <header>
-        <h1><a className="home-link" href="/" onClick={e => { e.preventDefault(); setQuery(''); history.pushState(null, '', '/'); }}>Kannaoke</a></h1>
-        <p className="subtitle">The Kanna Yanagi 🦆🔍 Karaoke Index</p>
-        <button
-          className={`dice-btn${rolling ? ' rolling' : ''}`}
-          onClick={rollDice}
-          aria-label="Play random song"
-          title="Play random song"
-        >
-          {(() => { const Icon = DICE_ICONS[diceIndex]; return <Icon size={28} />; })()}
-        </button>
-        <button
-          className="theme-btn"
-          onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-          aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-          title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-        >
-          {theme === 'dark' ? <IconSun size={20} /> : <IconMoon size={20} />}
-        </button>
-        <a
-          className="feedback-link"
-          href="https://marshmallow-qa.com/wco0tcuk8ipq15i"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Send feedback 💌
-        </a>
+        <div className="header-title">
+          <h1><a className="home-link" href="/" onClick={e => { e.preventDefault(); setQuery(''); history.pushState(null, '', '/'); }}>Kannaoke</a></h1>
+          <p className="subtitle">The Kanna Yanagi 🦆🔍 Karaoke Index</p>
+        </div>
+        <div className="header-actions">
+          <button
+            className={`dice-btn${rolling ? ' rolling' : ''}`}
+            onClick={rollDice}
+            aria-label="Play random song"
+            title="Play random song"
+          >
+            {(() => { const Icon = DICE_ICONS[diceIndex]; return <Icon size={24} />; })()}
+          </button>
+          <button
+            className="theme-btn"
+            onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+            title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+          >
+            {theme === 'dark' ? <IconSun size={24} /> : <IconMoon size={24} />}
+          </button>
+          <a
+            className="feedback-link"
+            href="https://marshmallow-qa.com/wco0tcuk8ipq15i"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Send feedback"
+            title="Send feedback"
+          >
+            <IconMailHeart size={24} />
+          </a>
+        </div>
       </header>
 
       <main ref={e => { mainRef.current = e; }}>
