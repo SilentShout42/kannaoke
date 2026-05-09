@@ -74,3 +74,35 @@ Edit `public/performances.json` directly. Each entry:
 ```
 
 `endTime` is optional — omit or set to `null` for songs with no defined end.
+
+## Verifying video metadata
+
+`scripts/verify-video-metadata.mjs` checks every `videoTitle` and `videoDate` in `performances.json` against the YouTube Data API and reports any mismatches.
+
+**Get an API key** (free, no billing required):
+
+1. Go to [console.cloud.google.com](https://console.cloud.google.com/) and create a project.
+2. Enable the **YouTube Data API v3** for the project.
+3. Create an **API key** credential (no OAuth needed).
+
+**Run the check:**
+
+```bash
+YOUTUBE_API_KEY=<key> node scripts/verify-video-metadata.mjs
+```
+
+Or pass the key inline:
+
+```bash
+node scripts/verify-video-metadata.mjs --key=<key>
+```
+
+**Apply corrections automatically** with `--fix`:
+
+```bash
+YOUTUBE_API_KEY=<key> node scripts/verify-video-metadata.mjs --fix
+```
+
+This writes corrected `videoTitle` and `videoDate` values back to `performances.json`. Run `npm run prepare:data` afterwards to rebuild the derived files.
+
+> **Note on dates:** the script prefers the actual stream start time for live broadcasts (`liveStreamingDetails.actualStartTime`), falling back to the video's publish date. If a date in `performances.json` was set manually to reflect a different broadcast date, review the diff before committing.
