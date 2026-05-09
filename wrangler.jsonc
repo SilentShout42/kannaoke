@@ -34,7 +34,7 @@
 		]
 	},
 	"vars": {
-		"DISCORD_CLIENT_ID": "REPLACE_WITH_DISCORD_CLIENT_ID",
+		"DISCORD_CLIENT_ID": "1502495294028251237",
 		"APP_BASE_URL": "https://kannaoke.oyasumi99.com"
 	}
 }
