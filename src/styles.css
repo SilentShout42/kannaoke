@@ -537,15 +537,15 @@ main {
     display: contents;
   }
 
-  .search-bar {
-    order: 1;
-  }
-
   .player-panel {
-    order: 2;
+    order: 1;
     flex-shrink: 0;
     padding: 1rem;
     border-bottom: 1px solid var(--border);
+  }
+
+  .search-bar {
+    order: 2;
   }
 
   .results-scroll-wrap {

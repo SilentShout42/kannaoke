@@ -16,6 +16,32 @@ const DICE_ICONS = [
   IconDice4Filled, IconDice5Filled, IconDice6Filled,
 ];
 
+const LITE_PLAYER = false;
+
+declare global {
+  interface Window {
+    YT: {
+      Player: new (el: string, opts: unknown) => YTPlayer;
+      PlayerState: Record<string, number>;
+    };
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
+
+interface YTPlayer {
+  loadVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
+  cueVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
+}
+
+function videoParams(entry: Performance) {
+  const p: { videoId: string; startSeconds: number; endSeconds?: number } = {
+    videoId: entry.videoId,
+    startSeconds: entry.startTime,
+  };
+  if (entry.endTime != null) p.endSeconds = entry.endTime;
+  return p;
+}
+
 interface Performance {
   title: string;
   artist: string;
@@ -35,6 +61,9 @@ export default function App() {
 
 
   const fuseRef = useRef<Fuse<Performance> | null>(null);
+  const ytPlayerRef = useRef<YTPlayer | null>(null);
+  const ytReadyRef = useRef(false);
+  const pendingRef = useRef<Performance | null>(null);
   const panelRef = useRef<HTMLElement | null>(null);
   const mainRef = useRef<HTMLElement | null>(null);
   const searchInputRef = useRef<HTMLInputElement | null>(null);
@@ -143,6 +172,41 @@ export default function App() {
         });
       }
 
+      if (!LITE_PLAYER) {
+        window.onYouTubeIframeAPIReady = () => {
+          const entry = pendingRef.current ?? initial;
+          pendingRef.current = null;
+          const playerVars: Record<string, unknown> = {
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            start: entry.startTime,
+          };
+          if (entry.endTime != null) playerVars.end = entry.endTime;
+          ytPlayerRef.current = new window.YT.Player('yt-player', {
+            videoId: entry.videoId,
+            playerVars,
+            events: {
+              onReady() {
+                ytReadyRef.current = true;
+                setRolling(false);
+                if (pendingRef.current) {
+                  ytPlayerRef.current!.loadVideoById(videoParams(pendingRef.current));
+                  pendingRef.current = null;
+                }
+              },
+              onStateChange({ data }: { data: number }) {
+                const { BUFFERING, CUED } = window.YT.PlayerState;
+                if ([BUFFERING, CUED].includes(data)) setRolling(false);
+              },
+            },
+          });
+        };
+
+        const tag = document.createElement('script');
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+      }
     };
 
     const loadData = async () => {
@@ -307,8 +371,17 @@ export default function App() {
 
   function selectEntry(entry: Performance, play = true, push = true) {
     pushNextNav.current = push;
-    setAutoplay(play);
-    setActiveEntry(entry);
+    if (LITE_PLAYER) {
+      setAutoplay(play);
+      setActiveEntry(entry);
+    } else {
+      setActiveEntry(entry);
+      if (ytReadyRef.current) {
+        ytPlayerRef.current!.loadVideoById(videoParams(entry));
+      } else {
+        pendingRef.current = entry;
+      }
+    }
   }
 
   function runDiceRoll(onComplete: () => void) {
@@ -504,24 +577,28 @@ export default function App() {
           )}
           <div className="yt-wrapper">
             <div className="yt-container">
-              {activeEntry && (autoplay ? (
-                <iframe
-                  key={`${activeEntry.videoId}-${activeEntry.startTime}`}
-                  src={`https://www.youtube-nocookie.com/embed/${activeEntry.videoId}?autoplay=1&start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
-                  title={activeEntry.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowFullScreen
-                />
+              {LITE_PLAYER ? (
+                activeEntry && (autoplay ? (
+                  <iframe
+                    key={`${activeEntry.videoId}-${activeEntry.startTime}`}
+                    src={`https://www.youtube-nocookie.com/embed/${activeEntry.videoId}?autoplay=1&start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
+                    title={activeEntry.title}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                ) : (
+                  <LiteYouTubeEmbed
+                    key={`${activeEntry.videoId}-${activeEntry.startTime}`}
+                    id={activeEntry.videoId}
+                    title={activeEntry.title}
+                    noCookie={true}
+                    poster="maxresdefault"
+                    params={`start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
+                  />
+                ))
               ) : (
-                <LiteYouTubeEmbed
-                  key={`${activeEntry.videoId}-${activeEntry.startTime}`}
-                  id={activeEntry.videoId}
-                  title={activeEntry.title}
-                  noCookie={true}
-                  poster="maxresdefault"
-                  params={`start=${activeEntry.startTime}${activeEntry.endTime != null ? `&end=${activeEntry.endTime}` : ''}&rel=0&playsinline=1`}
-                />
-              ))}
+                <div id="yt-player" />
+              )}
             </div>
           </div>
         </aside>
