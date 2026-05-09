@@ -7,6 +7,12 @@ declare namespace Cloudflare {
 	}
 	interface Env {
 		ASSETS: Fetcher;
+		DB: D1Database;
+		SESSIONS: KVNamespace;
+		DISCORD_CLIENT_ID: string;
+		DISCORD_CLIENT_SECRET: string;
+		APP_BASE_URL: string;
+		SESSION_SECRET: string;
 	}
 }
 interface Env extends Cloudflare.Env {}

@@ -1,15 +1,40 @@
 {
-  "name": "kannaoke",
-  "main": "src/worker.ts",
-  "compatibility_date": "2026-05-06",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "binding": "ASSETS",
-    "not_found_handling": "single-page-application",
-    "run_worker_first": true
-  },
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1
-  }
+	"name": "kannaoke",
+	"main": "src/worker.ts",
+	"compatibility_date": "2026-05-06",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"assets": {
+		"binding": "ASSETS",
+		"not_found_handling": "single-page-application",
+		"run_worker_first": true
+	},
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 1
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "kannaoke-db",
+			"database_id": "248ea7e4-cc9b-43ba-ac38-7bc01b1991c2"
+		},
+	],
+	"kv_namespaces": [
+		{
+			"binding": "SESSIONS",
+			"id": "10cd461e15c248fe83b999840cc90781",
+			"preview_id": "e7d62f24aa7d489e9e6b854a9806e97c"
+		},
+	],
+	"triggers": {
+		"crons": [
+			"* * * * *"
+		]
+	},
+	"vars": {
+		"DISCORD_CLIENT_ID": "REPLACE_WITH_DISCORD_CLIENT_ID",
+		"APP_BASE_URL": "https://kannaoke.oyasumi99.com"
+	}
 }
