@@ -215,6 +215,45 @@ async function createWebhook(request: Request, env: Env): Promise<Response> {
   return json({ id, webhookUrl, label: label ?? null, scheduleHour, scheduleMinute, timezone, active: 1 }, 201);
 }
 
+async function updateWebhook(request: Request, url: URL, env: Env): Promise<Response> {
+  const csrf = requireCsrf(request);
+  if (csrf) return csrf;
+  const session = await requireSession(request, env);
+  if (session instanceof Response) return session;
+
+  const id = url.pathname.split('/').pop();
+  if (!id) return json({ error: 'Missing webhook id' }, 400);
+
+  let body: { webhookUrl?: unknown; label?: unknown; scheduleHour?: unknown; scheduleMinute?: unknown; timezone?: unknown };
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: 'Invalid JSON' }, 400);
+  }
+
+  const { webhookUrl, label, scheduleHour, scheduleMinute, timezone } = body;
+  if (
+    typeof webhookUrl !== 'string' ||
+    !/^https:\/\/discord\.com\/api\/webhooks\/\d+\/[\w-]+$/.test(webhookUrl)
+  ) return json({ error: 'Invalid webhookUrl' }, 400);
+  if (!Number.isInteger(scheduleHour) || (scheduleHour as number) < 0 || (scheduleHour as number) > 23)
+    return json({ error: 'scheduleHour must be 0–23' }, 400);
+  if (!Number.isInteger(scheduleMinute) || (scheduleMinute as number) < 0 || (scheduleMinute as number) > 59)
+    return json({ error: 'scheduleMinute must be 0–59' }, 400);
+  if (typeof timezone !== 'string' || !validateTimezone(timezone))
+    return json({ error: 'Invalid timezone' }, 400);
+
+  const nextFireAt = computeNextFireAt(scheduleHour as number, scheduleMinute as number, timezone);
+  const result = await env.DB.prepare(
+    `UPDATE webhooks
+     SET webhook_url = ?, label = ?, schedule_hour = ?, schedule_minute = ?, timezone = ?, next_fire_at = ?
+     WHERE id = ? AND discord_id = ?`,
+  ).bind(webhookUrl, label ?? null, scheduleHour, scheduleMinute, timezone, nextFireAt, id, session.discordId).run();
+
+  if (!result.meta.changes) return json({ error: 'Not found' }, 404);
+  return json({ id, webhookUrl, label: label ?? null, scheduleHour, scheduleMinute, timezone, active: 1 });
+}
+
 async function deleteWebhook(request: Request, url: URL, env: Env): Promise<Response> {
   const csrf = requireCsrf(request);
   if (csrf) return csrf;
@@ -241,6 +280,7 @@ async function handleApi(request: Request, url: URL, env: Env): Promise<Response
   if (p === '/api/me' && method === 'GET') return getMe(request, env);
   if (p === '/api/webhooks' && method === 'GET') return listWebhooks(request, env);
   if (p === '/api/webhooks' && method === 'POST') return createWebhook(request, env);
+  if (p.startsWith('/api/webhooks/') && method === 'PATCH') return updateWebhook(request, url, env);
   if (p.startsWith('/api/webhooks/') && method === 'DELETE') return deleteWebhook(request, url, env);
 
   return json({ error: 'Not found' }, 404);

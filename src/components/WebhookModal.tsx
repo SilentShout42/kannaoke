@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { IconX, IconPlus, IconTrash, IconBrandDiscord, IconLoader2 } from '@tabler/icons-react';
+import { IconX, IconPlus, IconTrash, IconPencil, IconBrandDiscord, IconLoader2 } from '@tabler/icons-react';
 
 interface User {
   discordId: string;
@@ -15,6 +15,14 @@ interface Webhook {
   schedule_minute: number;
   timezone: string;
   active: number;
+}
+
+interface FormState {
+  webhookUrl: string;
+  label: string;
+  scheduleHour: number;
+  scheduleMinute: number;
+  timezone: string;
 }
 
 interface WebhookModalProps {
@@ -38,33 +46,44 @@ function pad(n: number): string {
 
 function formatSchedule(hour: number, minute: number, timezone: string): string {
   try {
-    const now = new Date();
-    now.setUTCHours(hour, minute, 0, 0);
-    return new Intl.DateTimeFormat('en-US', {
+    const tzAbbr = new Intl.DateTimeFormat('en-US', {
       timeZone: timezone,
-      hour: 'numeric',
-      minute: '2-digit',
       timeZoneName: 'short',
-      hour12: true,
-    }).format(now);
+    }).formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value ?? timezone;
+    const period = hour < 12 ? 'AM' : 'PM';
+    const h = hour % 12 || 12;
+    return `${h}:${pad(minute)} ${period} ${tzAbbr}`;
   } catch {
     return `${pad(hour)}:${pad(minute)}`;
   }
 }
 
+const BLANK_FORM: FormState = {
+  webhookUrl: '',
+  label: '',
+  scheduleHour: 9,
+  scheduleMinute: 0,
+  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+};
+
+function formFromWebhook(wh: Webhook): FormState {
+  return {
+    webhookUrl: wh.webhook_url,
+    label: wh.label ?? '',
+    scheduleHour: wh.schedule_hour,
+    scheduleMinute: wh.schedule_minute,
+    timezone: wh.timezone,
+  };
+}
+
 export default function WebhookModal({ onClose }: WebhookModalProps) {
   const [user, setUser] = useState<User | null | 'loading'>('loading');
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null); // null = create, string = editing existing
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [form, setForm] = useState({
-    webhookUrl: '',
-    label: '',
-    scheduleHour: 9,
-    scheduleMinute: 0,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-  });
+  const [form, setForm] = useState<FormState>(BLANK_FORM);
 
   useEffect(() => {
     fetch('/api/me', { headers: { 'X-Kannaoke-CSRF': '1' } })
@@ -78,30 +97,54 @@ export default function WebhookModal({ onClose }: WebhookModalProps) {
       .catch(() => setUser(null));
   }, []);
 
-  async function handleCreate(e: React.FormEvent) {
+  function openCreate() {
+    setEditingId(null);
+    setForm(BLANK_FORM);
+    setError(null);
+    setShowForm(true);
+  }
+
+  function openEdit(wh: Webhook) {
+    setEditingId(wh.id);
+    setForm(formFromWebhook(wh));
+    setError(null);
+    setShowForm(true);
+  }
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setError(null);
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
+    const body = {
+      webhookUrl: form.webhookUrl,
+      label: form.label.trim() || null,
+      scheduleHour: form.scheduleHour,
+      scheduleMinute: form.scheduleMinute,
+      timezone: form.timezone,
+    };
     try {
-      const res = await apiFetch('/api/webhooks', {
-        method: 'POST',
-        body: JSON.stringify({
-          webhookUrl: form.webhookUrl,
-          label: form.label.trim() || null,
-          scheduleHour: form.scheduleHour,
-          scheduleMinute: form.scheduleMinute,
-          timezone: form.timezone,
-        }),
-      });
+      const res = await apiFetch(
+        editingId ? `/api/webhooks/${editingId}` : '/api/webhooks',
+        { method: editingId ? 'PATCH' : 'POST', body: JSON.stringify(body) },
+      );
       if (!res.ok) {
         const data = await res.json<{ error: string }>();
         setError(data.error ?? 'Something went wrong');
         return;
       }
-      const created = await res.json<Webhook>();
-      setWebhooks(prev => [...prev, created]);
-      setShowForm(false);
-      setForm(f => ({ ...f, webhookUrl: '', label: '' }));
+      const saved = await res.json<Webhook>();
+      setWebhooks(prev =>
+        editingId
+          ? prev.map(w => w.id === editingId ? saved : w)
+          : [...prev, saved],
+      );
+      closeForm();
     } catch {
       setError('Network error');
     } finally {
@@ -111,7 +154,10 @@ export default function WebhookModal({ onClose }: WebhookModalProps) {
 
   async function handleDelete(id: string) {
     const res = await apiFetch(`/api/webhooks/${id}`, { method: 'DELETE' });
-    if (res.ok) setWebhooks(prev => prev.filter(w => w.id !== id));
+    if (res.ok) {
+      setWebhooks(prev => prev.filter(w => w.id !== id));
+      if (editingId === id) closeForm();
+    }
   }
 
   async function handleLogout() {
@@ -168,34 +214,47 @@ export default function WebhookModal({ onClose }: WebhookModalProps) {
                   <p className="webhook-empty">No webhooks yet. Add one below.</p>
                 )}
                 {webhooks.map(wh => (
-                  <div key={wh.id} className="webhook-item">
+                  <div key={wh.id} className={`webhook-item${editingId === wh.id ? ' editing' : ''}`}>
                     <div className="webhook-item-info">
                       <span className="webhook-item-label">{wh.label ?? wh.webhook_url}</span>
                       <span className="webhook-item-schedule">
                         {formatSchedule(wh.schedule_hour, wh.schedule_minute, wh.timezone)} daily
                       </span>
                     </div>
-                    <button
-                      className="webhook-delete-btn"
-                      onClick={() => handleDelete(wh.id)}
-                      aria-label="Delete webhook"
-                      title="Delete webhook"
-                    >
-                      <IconTrash size={16} />
-                    </button>
+                    <div className="webhook-item-actions">
+                      <button
+                        className="webhook-edit-btn"
+                        onClick={() => editingId === wh.id ? closeForm() : openEdit(wh)}
+                        aria-label="Edit webhook"
+                        title="Edit webhook"
+                      >
+                        <IconPencil size={15} />
+                      </button>
+                      <button
+                        className="webhook-delete-btn"
+                        onClick={() => handleDelete(wh.id)}
+                        aria-label="Delete webhook"
+                        title="Delete webhook"
+                      >
+                        <IconTrash size={15} />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
 
               {webhooks.length < 10 && !showForm && (
-                <button className="webhook-add-btn" onClick={() => setShowForm(true)}>
+                <button className="webhook-add-btn" onClick={openCreate}>
                   <IconPlus size={16} />
                   Add webhook
                 </button>
               )}
 
               {showForm && (
-                <form className="webhook-form" onSubmit={handleCreate}>
+                <form className="webhook-form" onSubmit={handleSubmit}>
+                  <p className="webhook-form-heading">
+                    {editingId ? 'Edit webhook' : 'New webhook'}
+                  </p>
                   <label className="webhook-form-label">
                     Webhook URL
                     <input
@@ -256,7 +315,7 @@ export default function WebhookModal({ onClose }: WebhookModalProps) {
                   </label>
                   {error && <p className="webhook-form-error">{error}</p>}
                   <div className="webhook-form-actions">
-                    <button type="button" className="webhook-cancel-btn" onClick={() => { setShowForm(false); setError(null); }}>
+                    <button type="button" className="webhook-cancel-btn" onClick={closeForm}>
                       Cancel
                     </button>
                     <button type="submit" className="webhook-submit-btn" disabled={submitting}>
