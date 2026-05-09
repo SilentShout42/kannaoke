@@ -362,6 +362,15 @@ main {
   color: var(--accent);
 }
 
+.song-thumb {
+  width: 72px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+}
+
 .result-text {
   flex: 1;
   min-width: 0;

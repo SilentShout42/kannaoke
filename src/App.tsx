@@ -526,6 +526,14 @@ export default function App() {
                   role="listitem"
                   onClick={() => selectEntry(entry)}
                 >
+                  <img
+                    className="song-thumb"
+                    src={`https://i.ytimg.com/vi/${entry.videoId}/mqdefault.jpg`}
+                    alt=""
+                    loading="lazy"
+                    width={72}
+                    height={40}
+                  />
                   <div className="result-text">
                     <div className="song-title">{entry.title}</div>
                     <div className="song-artist">{entry.artist}</div>
