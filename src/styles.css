@@ -529,28 +529,32 @@ main {
 
 /* Mobile */
 @media (max-width: 768px) {
-  body {
-    height: auto;
-    overflow: auto;
-  }
-
   main {
     flex-direction: column;
-    overflow: visible;
   }
 
   .results-panel {
-    width: 100% !important;
-    border-right: none;
+    display: contents;
+  }
+
+  .search-bar {
+    order: 1;
+  }
+
+  .player-panel {
+    order: 2;
+    flex-shrink: 0;
+    padding: 1rem;
     border-bottom: 1px solid var(--border);
-    max-height: 50vh;
+  }
+
+  .results-scroll-wrap {
+    order: 3;
+    flex: 1;
+    min-height: 0;
   }
 
   .resize-handle {
     display: none;
-  }
-
-  .player-panel {
-    padding: 1rem;
   }
 }
