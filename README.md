@@ -43,18 +43,24 @@ This builds the app and deploys it to `kannaoke.<your-subdomain>.workers.dev`. T
 ## Project structure
 
 ```
-index.html          Vite entry point
-vite.config.ts      Vite + Cloudflare plugin config
-wrangler.jsonc      Cloudflare Worker config
+index.html              Vite entry point
+vite.config.ts          Vite + Cloudflare plugin config
+wrangler.jsonc          Cloudflare Worker config (bindings, cron trigger, vars)
 src/
-  App.tsx           Main app component
-  main.tsx          React root
-  styles.css        Global styles
-worker/
-  index.ts          Cloudflare Worker (static asset pass-through)
+  App.tsx               Main app component
+  main.tsx              React root
+  styles.css            Global styles
+  worker.ts             Cloudflare Worker (OG meta, API routes, cron handler)
+  schema.sql            D1 database schema
+  lib/
+    schedule.ts         DST-safe next-fire-at computation
+    songPicker.ts       Random song selection
+    discord.ts          Discord embed builder + webhook POST
+  components/
+    WebhookModal.tsx    Discord sign-in and webhook management UI
 public/
-  performances.json Song data
-  ...               Favicons and web manifest
+  performances.json     Song data
+  ...                   Favicons and web manifest
 ```
 
 ## Updating song data
@@ -74,6 +80,74 @@ Edit `public/performances.json` directly. Each entry:
 ```
 
 `endTime` is optional — omit or set to `null` for songs with no defined end.
+
+## Discord webhook scheduler
+
+Users can sign in with Discord and schedule a daily random song post to any Discord channel via webhook. Each user can manage up to 10 webhooks, each with an independent time and timezone.
+
+### How it works
+
+- A Cloudflare Cron Trigger fires every minute and queries D1 for webhooks whose `next_fire_at` has passed.
+- For each due webhook, a random non-members-only, non-cover song is selected and posted as a Discord embed.
+- After firing, `next_fire_at` is advanced to the same wall-clock time the next day (DST-aware).
+
+### Discord application setup
+
+1. Go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a new application.
+2. Under **OAuth2**, add the following redirect URIs:
+   - `https://kannaoke.oyasumi99.com/api/auth/discord/callback` (production)
+   - `http://localhost:5173/api/auth/discord/callback` (local dev)
+3. Note the **Client ID** — it is already set as `DISCORD_CLIENT_ID` in `wrangler.jsonc`.
+4. Copy the **Client Secret** for use in the next step.
+
+### Secrets
+
+Set the following secrets (never commit these):
+
+```bash
+wrangler secret put DISCORD_CLIENT_SECRET
+wrangler secret put SESSION_SECRET
+```
+
+`SESSION_SECRET` can be any long random string — it is reserved for future use (HMAC signing). Generate one with `openssl rand -hex 32`.
+
+### Apply the database schema
+
+```bash
+# Production
+wrangler d1 execute kannaoke-db --file=src/schema.sql
+
+# Local dev
+wrangler d1 execute kannaoke-db --local --file=src/schema.sql
+```
+
+### Local development
+
+The dev server runs in the Cloudflare Workers runtime and supports D1 and KV locally out of the box.
+
+1. Apply the schema locally (see above).
+2. Set local secrets in `.dev.vars` (this file is git-ignored):
+
+   ```
+   DISCORD_CLIENT_SECRET=<your client secret>
+   SESSION_SECRET=<any random string>
+   ```
+
+3. Start the dev server:
+
+   ```bash
+   npm run dev
+   ```
+
+   Discord OAuth will redirect back to `http://localhost:5173/api/auth/discord/callback` — make sure that URI is registered in your Discord application (see above).
+
+4. To test the cron handler locally, use the Wrangler tail or trigger it manually via the Workers dashboard. You can also invoke it directly:
+
+   ```bash
+   curl -X POST "http://localhost:8787/__scheduled?cron=*+*+*+*+*"
+   ```
+
+   Note: this endpoint is only available in `wrangler dev`, not in production.
 
 ## Verifying video metadata
 

@@ -212,7 +212,7 @@ async function createWebhook(request: Request, env: Env): Promise<Response> {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
   ).bind(id, session.discordId, webhookUrl, label ?? null, scheduleHour, scheduleMinute, timezone, nextFireAt).run();
 
-  return json({ id, webhookUrl, label: label ?? null, scheduleHour, scheduleMinute, timezone, active: 1 }, 201);
+  return json({ id, webhook_url: webhookUrl, label: label ?? null, schedule_hour: scheduleHour, schedule_minute: scheduleMinute, timezone, active: 1 }, 201);
 }
 
 async function updateWebhook(request: Request, url: URL, env: Env): Promise<Response> {
@@ -251,7 +251,7 @@ async function updateWebhook(request: Request, url: URL, env: Env): Promise<Resp
   ).bind(webhookUrl, label ?? null, scheduleHour, scheduleMinute, timezone, nextFireAt, id, session.discordId).run();
 
   if (!result.meta.changes) return json({ error: 'Not found' }, 404);
-  return json({ id, webhookUrl, label: label ?? null, scheduleHour, scheduleMinute, timezone, active: 1 });
+  return json({ id, webhook_url: webhookUrl, label: label ?? null, schedule_hour: scheduleHour, schedule_minute: scheduleMinute, timezone, active: 1 });
 }
 
 async function deleteWebhook(request: Request, url: URL, env: Env): Promise<Response> {
