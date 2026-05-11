@@ -1,0 +1,323 @@
+import { pickRandomSong, type SongEntry } from '../src/lib/songPicker';
+import { computeNextFireAt } from '../src/lib/schedule';
+import { buildSongEmbed, postToWebhook } from '../src/lib/discord';
+import {
+  verifyInteraction,
+  pongResponse,
+  embedResponse,
+  ephemeralResponse,
+  deferredResponse,
+  postFollowUp,
+  createChannelWebhook,
+  deleteWebhook,
+  type DiscordInteraction,
+  type Embed,
+} from './discord';
+
+interface ScheduleRow {
+  id: number;
+  guild_id: string;
+  channel_id: string;
+  webhook_url: string;
+  schedule_hour: number;
+  schedule_minute: number;
+  timezone: string;
+  next_fire_at: number;
+  active: number;
+}
+
+interface Env {
+  DB: D1Database;
+  DISCORD_BOT_TOKEN: string;
+  DISCORD_PUBLIC_KEY: string;
+  BASE_URL: string;
+}
+
+function validateTimezone(tz: string): boolean {
+  try {
+      new Intl.DateTimeFormat('en', { timeZone: tz });
+      return true;
+     } catch {
+     return false;
+     }
+}
+
+function formatTzAbbr(timezone: string): string {
+  try {
+    const tzAbbr = new Intl.DateTimeFormat('en-US', {
+        timeZone: timezone,
+        timeZoneName: 'short',
+       }).formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value;
+    return tzAbbr ?? timezone;
+    } catch {
+    return timezone;
+    }
+}
+
+// ─── Command handlers ──────────────────────────────────────────────────────────
+
+async function handleRandom(env: Env): Promise<Response> {
+  try {
+    const perfResp = await fetch(`${env.BASE_URL}/performances.min.json`);
+    if (!perfResp.ok) {
+        return ephemeralResponse(`Failed to load song data (${perfResp.status})`);
+        }
+    const performances: SongEntry[] = await perfResp.json();
+    const song = pickRandomSong(performances);
+    if (!song) {
+        return ephemeralResponse('No songs available');
+        }
+    const embed: Embed = buildSongEmbed(song, env.BASE_URL);
+    return embedResponse(embed);
+    } catch (err) {
+    return ephemeralResponse(`Error: ${err}`);
+    }
+}
+
+async function handleScheduleSet(
+  interaction: DiscordInteraction,
+  env: Env,
+  waitUntil: (p: Promise<void>) => void,
+): Promise<Response> {
+  const opts = interaction.data.options as Array<{ name: string; value: unknown }>;
+  const hour = Number(opts.find(o => o.name === 'hour')?.value);
+  const minute = Number(opts.find(o => o.name === 'minute')?.value);
+  const timezone = (opts.find(o => o.name === 'timezone')?.value as string) ?? 'UTC';
+
+  if (!Number.isInteger(hour) || hour < 0 || hour > 23) {
+      return ephemeralResponse('Hour must be 0–23');
+      }
+  if (!Number.isInteger(minute) || minute < 0 || minute > 59) {
+      return ephemeralResponse('Minute must be 0–59');
+      }
+  if (!validateTimezone(timezone)) {
+      return ephemeralResponse('Invalid timezone. Use IANA format (e.g., America/New_York)');
+      }
+
+  const guildId = interaction.guild_id;
+  const channelId = interaction.channel_id;
+  if (!guildId || !channelId) {
+      return ephemeralResponse('This command can only be used in a server channel');
+      }
+
+    // Return deferred response immediately, then do async work in background
+  const deferred = deferredResponse();
+  const locationUrl = deferred.headers.get('Location');
+
+  waitUntil(
+    (async () => {
+        // Create a webhook in this channel for scheduled posts
+       const newWebhookUrl = await createChannelWebhook(channelId, env.DISCORD_BOT_TOKEN, 'Kannaoke Bot');
+
+        // Compute next fire time
+       const nextFireAt = computeNextFireAt(hour, minute, timezone);
+
+        // Upsert schedule
+       await env.DB.prepare(
+            `INSERT INTO schedules (guild_id, channel_id, webhook_url, schedule_hour, schedule_minute, timezone, next_fire_at, active, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 1, unixepoch())
+            ON CONFLICT(guild_id, channel_id) DO UPDATE SET
+              webhook_url = excluded.webhook_url,
+              schedule_hour = excluded.schedule_hour,
+              schedule_minute = excluded.schedule_minute,
+              timezone = excluded.timezone,
+              next_fire_at = excluded.next_fire_at,
+              active = 1,
+              updated_at = unixepoch()
+            WHERE excluded.guild_id = schedules.guild_id AND excluded.channel_id = schedules.channel_id`,
+          ).bind(guildId, channelId, newWebhookUrl, hour, minute, timezone, nextFireAt).run();
+
+       const tzAbbr = formatTzAbbr(timezone);
+       const h = String(hour).padStart(2, '0');
+       const m = String(minute).padStart(2, '0');
+       await postFollowUp(locationUrl!, `Scheduled! A random song will be posted daily at ${h}:${m} ${tzAbbr}`);
+      })().catch(err => {
+       console.error(JSON.stringify({ event: 'schedule_set_error', error: String(err) }));
+      }),
+    );
+
+  return deferred;
+}
+
+async function handleScheduleCancel(interaction: DiscordInteraction, env: Env): Promise<Response> {
+  const guildId = interaction.guild_id;
+  const channelId = interaction.channel_id;
+  if (!guildId || !channelId) {
+      return ephemeralResponse('This command can only be used in a server channel');
+      }
+
+  const { results } = await env.DB.prepare(
+        `SELECT webhook_url FROM schedules WHERE guild_id = ? AND channel_id = ? AND active = 1`,
+      ).bind(guildId, channelId).all<{ webhook_url: string }>();
+
+  if (!results.length) {
+      return ephemeralResponse('No active schedule found for this channel');
+      }
+
+  const webhookUrl = results[0].webhook_url;
+
+    // Deactivate in DB
+  await env.DB.prepare(
+        `UPDATE schedules SET active = 0, updated_at = unixepoch() WHERE guild_id = ? AND channel_id = ?`,
+      ).bind(guildId, channelId).run();
+
+    // Delete the webhook from Discord
+  try {
+    await deleteWebhook(webhookUrl);
+    } catch {
+        // Best effort — schedule is already deactivated in DB
+    }
+
+  return ephemeralResponse('Schedule cancelled');
+}
+
+async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): Promise<Response> {
+  const guildId = interaction.guild_id;
+  const channelId = interaction.channel_id;
+  if (!guildId || !channelId) {
+      return ephemeralResponse('This command can only be used in a server channel');
+      }
+
+  const { results } = await env.DB.prepare(
+        `SELECT schedule_hour, schedule_minute, timezone, active FROM schedules WHERE guild_id = ? AND channel_id = ?`,
+      ).bind(guildId, channelId).all<ScheduleRow>();
+
+  if (!results.length || !results[0].active) {
+      return ephemeralResponse('No active schedule for this channel. Use /schedule set to configure one.');
+      }
+
+  const s = results[0];
+  const tzAbbr = formatTzAbbr(s.timezone);
+  const h = String(s.schedule_hour).padStart(2, '0');
+  const m = String(s.schedule_minute).padStart(2, '0');
+  return ephemeralResponse(`Currently posting daily at ${h}:${m} ${tzAbbr} (${s.timezone})`);
+}
+
+// ─── Interaction router ───────────────────────────────────────────────────────
+
+async function handleInteraction(
+  interaction: DiscordInteraction,
+  env: Env,
+  waitUntil: (p: Promise<void>) => void,
+): Promise<Response> {
+    // Discord interaction types: 1 = PING, 3 = APPLICATION_COMMAND
+  if (interaction.type === 1) {
+      return pongResponse();
+      }
+
+  if (interaction.type !== 3) {
+      return ephemeralResponse(`Unsupported interaction type: ${interaction.type}`);
+      }
+
+  const { name } = interaction.data;
+
+  if (name === 'random' || name === 'gacha') {
+      return handleRandom(env);
+      }
+
+  if (name === 'schedule') {
+    const subcommand = (interaction.data.options as Array<{ name: string }>)?.[0]?.name;
+    if (subcommand === 'set') return handleScheduleSet(interaction, env, waitUntil);
+    if (subcommand === 'cancel') return handleScheduleCancel(interaction, env);
+    if (subcommand === 'status') return handleScheduleStatus(interaction, env);
+        // No subcommand = show status by default
+    return handleScheduleStatus(interaction, env);
+    }
+
+  return ephemeralResponse(`Unknown command: ${name}`);
+}
+
+// ─── Fetch handler ─────────────────────────────────────────────────────────────
+
+async function fetchHandler(
+  request: Request,
+  env: Env,
+  _ctx: ExecutionContext,
+): Promise<Response> {
+  const url = new URL(request.url);
+
+  if (url.pathname !== '/api/interactions') {
+      return new Response('Not found', { status: 404 });
+      }
+  if (request.method !== 'POST') {
+      return new Response('Method not allowed', { status: 405 });
+      }
+
+  const signature = request.headers.get('X-Signature-Ed25519');
+  const timestamp = request.headers.get('X-Signature-Timestamp');
+
+  const rawBody = await request.arrayBuffer();
+  const bodyBytes = new Uint8Array(rawBody);
+
+  if (!signature || !timestamp) {
+      return new Response('Missing signature headers', { status: 401 });
+      }
+
+  const valid = await verifyInteraction(env.DISCORD_PUBLIC_KEY, signature, timestamp, bodyBytes);
+  if (!valid) {
+      console.log(JSON.stringify({ event: 'bad_signature', ip: request.headers.get('cf-ipCountry') }));
+      return new Response('Unauthorized', { status: 401 });
+      }
+
+  const interaction: DiscordInteraction = JSON.parse(new TextDecoder().decode(bodyBytes));
+  return handleInteraction(interaction, env, _ctx.waitUntil.bind(_ctx));
+}
+
+// ─── Scheduled handler ────────────────────────────────────────────────────────
+
+async function fireSchedule(schedule: ScheduleRow, performances: SongEntry[], env: Env): Promise<void> {
+  const song = pickRandomSong(performances);
+  if (!song) return;
+
+  const embed = buildSongEmbed(song, env.BASE_URL);
+  await postToWebhook(schedule.webhook_url, embed);
+
+  const nextFireAt = computeNextFireAt(schedule.schedule_hour, schedule.schedule_minute, schedule.timezone);
+  await env.DB.prepare(
+        `UPDATE schedules SET next_fire_at = ?, updated_at = unixepoch() WHERE id = ?`,
+      ).bind(nextFireAt, schedule.id).run();
+
+  console.log(JSON.stringify({
+     event: 'scheduled_post',
+     id: schedule.id,
+     guildId: schedule.guild_id,
+     channelId: schedule.channel_id,
+     song: song.title,
+     nextFireAt,
+    }));
+}
+
+// ─── Export ────────────────────────────────────────────────────────────────────
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+      return fetchHandler(request, env, ctx);
+      },
+
+  async scheduled(_event: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    const nowSec = Math.floor(Date.now() / 1000);
+    const { results } = await env.DB.prepare(
+          `SELECT * FROM schedules WHERE active = 1 AND next_fire_at <= ?`,
+        ).bind(nowSec).all<ScheduleRow>();
+
+    if (!results.length) return;
+
+        // Fetch performances once for all schedules
+    const perfResp = await fetch(`${env.BASE_URL}/performances.min.json`);
+    if (!perfResp.ok) {
+      console.error(JSON.stringify({ event: 'scheduled_error', error: `failed to load performances: ${perfResp.status}` }));
+      return;
+      }
+    const performances: SongEntry[] = await perfResp.json();
+
+    ctx.waitUntil(
+      Promise.allSettled(
+        results.map(s =>
+          fireSchedule(s, performances, env).catch(err =>
+            console.error(JSON.stringify({ event: 'schedule_error', id: s.id, error: String(err) })),
+            ),
+          ),
+        ),
+      );
+    },
+} satisfies ExportedHandler<Env>;

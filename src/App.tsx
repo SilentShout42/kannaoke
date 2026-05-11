@@ -4,13 +4,12 @@ import type { IFuseOptions } from 'fuse.js';
 import {
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
   IconDice4Filled, IconDice5Filled, IconDice6Filled, IconDiscFilled, IconLockSquareRoundedFilled, IconX,
-  IconSun, IconMoon, IconMailHeart, IconBrandDiscord,
+  IconSun, IconMoon, IconMailHeart,
 } from '@tabler/icons-react';
 import LiteYouTubeEmbed from 'react-lite-youtube-embed';
 import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
 import { formatDate } from './formatDate';
-import WebhookModal from './components/WebhookModal';
 
 const DICE_ICONS = [
   IconDice1Filled, IconDice2Filled, IconDice3Filled,
@@ -96,7 +95,6 @@ export default function App() {
     });
   };
   const [autoplay, setAutoplay] = useState(false);
-  const [showManage, setShowManage] = useState(() => new URLSearchParams(window.location.search).has('manage'));
   const pushNextNav = useRef(false);
   const [diceIndex, setDiceIndex] = useState(0);
   const [rolling, setRolling] = useState(false);
@@ -320,20 +318,6 @@ export default function App() {
     }
   }, [query]);
 
-  // Sync manage modal → URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (showManage) {
-      params.set('manage', '1');
-    } else {
-      params.delete('manage');
-    }
-    const next = params.toString() ? `?${params.toString()}` : window.location.pathname;
-    if ((window.location.search || '') !== (params.toString() ? `?${params.toString()}` : '')) {
-      history.replaceState(null, '', next);
-    }
-  }, [showManage]);
-
   // Sync query → URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -481,17 +465,8 @@ export default function App() {
           >
             <IconMailHeart size={24} />
           </a>
-          <button
-            className="discord-btn"
-            onClick={() => setShowManage(true)}
-            aria-label="Manage daily song webhooks"
-            title="Manage daily song webhooks"
-          >
-            <IconBrandDiscord size={24} />
-          </button>
-        </div>
-      </header>
-      {showManage && <WebhookModal onClose={() => setShowManage(false)} />}
+          </div>
+        </header>
 
       <main ref={e => { mainRef.current = e; }}>
         <section className="results-panel" ref={e => { panelRef.current = e; }}>

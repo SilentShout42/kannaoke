@@ -15,5 +15,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "worker-configuration.d.ts"]
+  "include": ["src", "bot", "worker-configuration.d.ts"]
 }

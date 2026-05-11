@@ -45,23 +45,29 @@ This builds the app and deploys it to `kannaoke.<your-subdomain>.workers.dev`. T
 ```
 index.html              Vite entry point
 vite.config.ts          Vite + Cloudflare plugin config
-wrangler.jsonc          Cloudflare Worker config (bindings, cron trigger, vars)
+wrangler.jsonc          Cloudflare Worker config
 src/
   App.tsx               Main app component
   main.tsx              React root
   styles.css            Global styles
-  worker.ts             Cloudflare Worker (OG meta, API routes, cron handler)
-  schema.sql            D1 database schema
+  worker.ts             Cloudflare Worker (OG meta injection for link unfurling)
   lib/
     schedule.ts         DST-safe next-fire-at computation
     songPicker.ts       Random song selection
-    discord.ts          Discord embed builder + webhook POST
-  components/
-    WebhookModal.tsx    Discord sign-in and webhook management UI
+    discord.ts          Discord embed builder + webhook POST (shared with bot)
 public/
   performances.json     Song data
-  ...                   Favicons and web manifest
+    ...                 Favicons and web manifest
+bot/
+  worker.ts             Discord bot (interaction handler + cron scheduler)
+  discord.ts            Discord API helpers (verification, responses, webhooks)
+  schema.sql            D1 schema (schedules table)
+  wrangler.jsonc        Bot worker config
+scripts/
+  register-bot-commands.mjs  Slash command registration
 ```
+
+
 
 ## Updating song data
 
@@ -81,73 +87,68 @@ Edit `public/performances.json` directly. Each entry:
 
 `endTime` is optional — omit or set to `null` for songs with no defined end.
 
-## Discord webhook scheduler
+## Discord bot
 
-Users can sign in with Discord and schedule a daily random song post to any Discord channel via webhook. Each user can manage up to 10 webhooks, each with an independent time and timezone.
+A standalone Discord bot supports `/random` (alias `/gacha`) for posting random songs and `/schedule` for daily automated posts. The bot lives in the `bot/` directory.
 
-### How it works
+### Commands
 
-- A Cloudflare Cron Trigger fires every minute and queries D1 for webhooks whose `next_fire_at` has passed.
-- For each due webhook, a random non-members-only, non-cover song is selected and posted as a Discord embed.
-- After firing, `next_fire_at` is advanced to the same wall-clock time the next day (DST-aware).
+| Command | Description |
+|---|---|
+| `/random` | Post a random song to the channel |
+| `/gacha` | Same as `/random` |
+| `/schedule set` | Set up daily scheduled posting |
+| `/schedule cancel` | Disable scheduled posting |
+| `/schedule status` | Show current schedule |
 
-### Discord application setup
+### Setup
 
-1. Go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a new application.
-2. Under **OAuth2**, add the following redirect URIs:
-   - `https://kannaoke.oyasumi99.com/api/auth/discord/callback` (production)
-   - `http://localhost:5173/api/auth/discord/callback` (local dev)
-3. Note the **Client ID** — it is already set as `DISCORD_CLIENT_ID` in `wrangler.jsonc`.
-4. Copy the **Client Secret** for use in the next step.
+1. Go to [discord.com/developers/applications](https://discord.com/developers/applications) and create a new application named "Kannaoke Bot".
+2. Under **Bot**, create a bot and copy the **Token** and **Public Key**.
+3. Under **OAuth2**, generate a bot invite URL with these scopes and permissions:
+    - Scopes: `bot`
+    - Bot Permissions: `Send Messages`, `Embed Links`, `Manage Webhooks`
+4. Set the **Interactions Endpoint URL** to `https://kannaoke-bot.oyasumi99.com/api/interactions` (or your `.workers.dev` URL during development).
+5. Create the D1 database and apply the schema:
 
-### Secrets
+    ```bash
+   wrangler d1 create kannaoke-bot-db
+    # Update bot/wrangler.jsonc with the database_id from above
+   wrangler d1 execute kannaoke-bot-db --file=bot/schema.sql
+    ```
 
-Set the following secrets (never commit these):
+6. Set secrets:
 
-```bash
-wrangler secret put DISCORD_CLIENT_SECRET
-wrangler secret put SESSION_SECRET
+    ```bash
+   wrangler secret put DISCORD_BOT_TOKEN --config bot/wrangler.jsonc
+   wrangler secret put DISCORD_PUBLIC_KEY --config bot/wrangler.jsonc
+    ```
+
+7. Register slash commands:
+
+    ```bash
+   DISCORD_CLIENT_ID=<your-client-id> DISCORD_BOT_TOKEN=<your-token> npm run bot:register
+    ```
+
+8. Deploy:
+
+    ```bash
+   npm run bot:deploy
+    ```
+
+9. Invite the bot to your server using the URL from step 3.
+
+### Project structure
+
 ```
-
-`SESSION_SECRET` can be any long random string — it is reserved for future use (HMAC signing). Generate one with `openssl rand -hex 32`.
-
-### Apply the database schema
-
-```bash
-# Production
-wrangler d1 execute kannaoke-db --file=src/schema.sql
-
-# Local dev
-wrangler d1 execute kannaoke-db --local --file=src/schema.sql
+bot/
+  worker.ts          Interaction handler + cron scheduler
+  discord.ts         Discord API helpers (verification, responses, webhooks)
+  schema.sql         D1 schema (schedules table)
+  wrangler.jsonc     Worker config
+scripts/
+  register-bot-commands.mjs  Slash command registration
 ```
-
-### Local development
-
-The dev server runs in the Cloudflare Workers runtime and supports D1 and KV locally out of the box.
-
-1. Apply the schema locally (see above).
-2. Set local secrets in `.dev.vars` (this file is git-ignored):
-
-   ```
-   DISCORD_CLIENT_SECRET=<your client secret>
-   SESSION_SECRET=<any random string>
-   ```
-
-3. Start the dev server:
-
-   ```bash
-   npm run dev
-   ```
-
-   Discord OAuth will redirect back to `http://localhost:5173/api/auth/discord/callback` — make sure that URI is registered in your Discord application (see above).
-
-4. To test the cron handler locally, use the Wrangler tail or trigger it manually via the Workers dashboard. You can also invoke it directly:
-
-   ```bash
-   curl -X POST "http://localhost:8787/__scheduled?cron=*+*+*+*+*"
-   ```
-
-   Note: this endpoint is only available in `wrangler dev`, not in production.
 
 ## Verifying video metadata
 

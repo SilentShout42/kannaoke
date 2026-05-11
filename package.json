@@ -11,7 +11,11 @@
     "preview": "npm run build && wrangler dev --config dist/kannaoke/wrangler.json",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types",
-    "test": "vitest run --config vitest.config.ts"
+    "test": "vitest run --config vitest.config.ts",
+    "bot:deploy": "wrangler deploy --config bot/wrangler.jsonc",
+    "bot:dev": "wrangler dev --config bot/wrangler.jsonc",
+    "bot:typegen": "wrangler types --config bot/wrangler.jsonc",
+    "bot:register": "node scripts/register-bot-commands.mjs"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.42.0",
