@@ -1,27 +1,25 @@
 {
-   "name": "kannaoke-bot",
-   "main": "bot/worker.ts",
-   "compatibility_date": "2026-05-06",
-   "compatibility_flags": [
-      "nodejs_compat"
-   ],
-   "d1_databases": [
-     {
-       "binding": "DB",
-       "database_name": "kannaoke-bot-db",
-       "database_id": "2337e6aa-3139-4746-9a86-bd8e35342a40"
-     }
-   ],
-   "triggers": {
-      "crons": [
-        "* * * * *"
-       ]
+  "name": "kannaoke-bot",
+  "main": "./worker.ts",
+  "workers_dev": false,
+  "preview_urls": false,
+  "compatibility_date": "2026-05-06",
+  "compatibility_flags": ["nodejs_compat"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "kannaoke-bot-db",
+      "database_id": "2337e6aa-3139-4746-9a86-bd8e35342a40",
     },
-   "observability": {
-      "enabled": true,
-      "head_sampling_rate": 1
-    },
-   "vars": {
-      "BASE_URL": "https://kannaoke.oyasumi99.com"
-    }
+  ],
+  "triggers": {
+    "crons": ["* * * * *"],
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+  "vars": {
+    "BASE_URL": "https://kannaoke.oyasumi99.com",
+  },
 }
