@@ -23,6 +23,16 @@ vi.mock('../src/lib/discord', () => ({
    postToWebhook: vi.fn(),
 }));
 
+vi.mock('./discord', () => ({
+  verifyInteraction: vi.fn().mockResolvedValue(true),
+  pongResponse: vi.fn(() => new Response(JSON.stringify({ type: 1 }), { headers: { 'Content-Type': 'application/json' } })),
+  ephemeralResponse: vi.fn((content) => new Response(JSON.stringify({ type: 4, content, flags: 64 }), { headers: { 'Content-Type': 'application/json' } })),
+  deferredResponse: vi.fn(() => new Response(JSON.stringify({ type: 5 }), { headers: { 'Content-Type': 'application/json' } })),
+  postFollowUp: vi.fn(),
+  createChannelWebhook: vi.fn(),
+  deleteWebhook: vi.fn(),
+}));
+
 const { pickRandomSong } = await import('../src/lib/songPicker');
 const { postToWebhook } = await import('../src/lib/discord');
 
@@ -115,4 +125,51 @@ describe('bot worker', () => {
       expect(postToWebhook).toHaveBeenCalled();
        });
    });
+
+  describe('interaction handler', () => {
+    it('responds with pong for PING', async () => {
+      const req = new Request('https://bot.test/api/interactions', {
+        method: 'POST',
+        body: JSON.stringify({ type: 1 }),
+        headers: {
+          'X-Signature-Ed25519': 'valid',
+          'X-Signature-Timestamp': '123',
+          'Content-Type': 'application/json',
+        },
+      });
+      const resp = await worker.fetch(req, {} as any, mockCtx);
+      const body = JSON.parse(await resp.text());
+      expect(body.type).toBe(1); // PONG
+    });
+
+    it('rejects unsupported interaction types', async () => {
+      const req = new Request('https://bot.test/api/interactions', {
+        method: 'POST',
+        body: JSON.stringify({ type: 3 }),
+        headers: {
+          'X-Signature-Ed25519': 'valid',
+          'X-Signature-Timestamp': '123',
+          'Content-Type': 'application/json',
+        },
+      });
+      const resp = await worker.fetch(req, {} as any, mockCtx);
+      const body = JSON.parse(await resp.text());
+      expect(body.type).toBe(4); // CHANNEL_MESSAGE_WITH_SOURCE (ephemeral error)
+    });
+
+    it('defers random command response', async () => {
+      const req = new Request('https://bot.test/api/interactions', {
+        method: 'POST',
+        body: JSON.stringify({ type: 2, application_id: 'app1', token: 'tok1', data: { name: 'random' } }),
+        headers: {
+          'X-Signature-Ed25519': 'valid',
+          'X-Signature-Timestamp': '123',
+          'Content-Type': 'application/json',
+        },
+      });
+      const resp = await worker.fetch(req, {} as any, mockCtx);
+      const body = JSON.parse(await resp.text());
+      expect(body.type).toBe(5); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+    });
+  });
 });

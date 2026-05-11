@@ -4,7 +4,6 @@ import { buildSongEmbed, postToWebhook } from '../src/lib/discord';
 import {
   verifyInteraction,
   pongResponse,
-  embedResponse,
   ephemeralResponse,
   deferredResponse,
   postFollowUp,
@@ -56,23 +55,32 @@ function formatTzAbbr(timezone: string): string {
 
 // ─── Command handlers ──────────────────────────────────────────────────────────
 
-async function handleRandom(env: Env): Promise<Response> {
-  try {
-    const perfResp = await fetch(`${env.BASE_URL}/performances.min.json`);
-    if (!perfResp.ok) {
-        return ephemeralResponse(`Failed to load song data (${perfResp.status})`);
+async function handleRandom(interaction: DiscordInteraction, env: Env, waitUntil: (p: Promise<void>) => void): Promise<Response> {
+  const deferred = deferredResponse();
+
+  waitUntil(
+    (async () => {
+      try {
+        const perfResp = await fetch(`${env.BASE_URL}/performances.min.json`);
+        if (!perfResp.ok) {
+          throw new Error(`Failed to load song data (${perfResp.status})`);
         }
-    const performances: SongEntry[] = await perfResp.json();
-    const song = pickRandomSong(performances);
-    if (!song) {
-        return ephemeralResponse('No songs available');
+        const performances: SongEntry[] = await perfResp.json();
+        const song = pickRandomSong(performances);
+        if (!song) {
+          throw new Error('No songs available');
         }
-    const embed: Embed = buildSongEmbed(song, env.BASE_URL);
-    return embedResponse(embed);
-    } catch (err) {
-    return ephemeralResponse(`Error: ${err}`);
-    }
+        const embed: Embed = buildSongEmbed(song, env.BASE_URL);
+        await postFollowUp(interaction.application_id, interaction.token, undefined, [embed]);
+      } catch (err) {
+        await postFollowUp(interaction.application_id, interaction.token, String(err), undefined, 64);
+      }
+    })(),
+  );
+
+  return deferred;
 }
+
 
 async function handleScheduleSet(
   interaction: DiscordInteraction,
@@ -86,58 +94,58 @@ async function handleScheduleSet(
 
   if (!Number.isInteger(hour) || hour < 0 || hour > 23) {
       return ephemeralResponse('Hour must be 0–23');
-      }
+       }
   if (!Number.isInteger(minute) || minute < 0 || minute > 59) {
       return ephemeralResponse('Minute must be 0–59');
-      }
+       }
   if (!validateTimezone(timezone)) {
       return ephemeralResponse('Invalid timezone. Use IANA format (e.g., America/New_York)');
-      }
+       }
 
   const guildId = interaction.guild_id;
   const channelId = interaction.channel_id;
   if (!guildId || !channelId) {
       return ephemeralResponse('This command can only be used in a server channel');
-      }
+       }
 
-    // Return deferred response immediately, then do async work in background
+  // Return deferred response immediately, then do async work in background
   const deferred = deferredResponse();
-  const locationUrl = deferred.headers.get('Location');
 
   waitUntil(
     (async () => {
-        // Create a webhook in this channel for scheduled posts
-       const newWebhookUrl = await createChannelWebhook(channelId, env.DISCORD_BOT_TOKEN, 'Kannaoke Bot');
+      // Create a webhook in this channel for scheduled posts
+      const newWebhookUrl = await createChannelWebhook(channelId, env.DISCORD_BOT_TOKEN, 'Kannaoke Bot');
 
-        // Compute next fire time
-       const nextFireAt = computeNextFireAt(hour, minute, timezone);
+      // Compute next fire time
+      const nextFireAt = computeNextFireAt(hour, minute, timezone);
 
-        // Upsert schedule
-       await env.DB.prepare(
-            `INSERT INTO schedules (guild_id, channel_id, webhook_url, schedule_hour, schedule_minute, timezone, next_fire_at, active, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 1, unixepoch())
-            ON CONFLICT(guild_id, channel_id) DO UPDATE SET
-              webhook_url = excluded.webhook_url,
-              schedule_hour = excluded.schedule_hour,
-              schedule_minute = excluded.schedule_minute,
-              timezone = excluded.timezone,
-              next_fire_at = excluded.next_fire_at,
-              active = 1,
-              updated_at = unixepoch()
-            WHERE excluded.guild_id = schedules.guild_id AND excluded.channel_id = schedules.channel_id`,
-          ).bind(guildId, channelId, newWebhookUrl, hour, minute, timezone, nextFireAt).run();
+      // Upsert schedule
+      await env.DB.prepare(
+        `INSERT INTO schedules (guild_id, channel_id, webhook_url, schedule_hour, schedule_minute, timezone, next_fire_at, active, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 1, unixepoch())
+        ON CONFLICT(guild_id, channel_id) DO UPDATE SET
+          webhook_url = excluded.webhook_url,
+          schedule_hour = excluded.schedule_hour,
+          schedule_minute = excluded.schedule_minute,
+          timezone = excluded.timezone,
+          next_fire_at = excluded.next_fire_at,
+          active = 1,
+          updated_at = unixepoch()
+        WHERE excluded.guild_id = schedules.guild_id AND excluded.channel_id = schedules.channel_id`,
+        ).bind(guildId, channelId, newWebhookUrl, hour, minute, timezone, nextFireAt).run();
 
-       const tzAbbr = formatTzAbbr(timezone);
-       const h = String(hour).padStart(2, '0');
-       const m = String(minute).padStart(2, '0');
-       await postFollowUp(locationUrl!, `Scheduled! A random song will be posted daily at ${h}:${m} ${tzAbbr}`);
-      })().catch(err => {
-       console.error(JSON.stringify({ event: 'schedule_set_error', error: String(err) }));
-      }),
-    );
+      const tzAbbr = formatTzAbbr(timezone);
+      const h = String(hour).padStart(2, '0');
+      const m = String(minute).padStart(2, '0');
+      await postFollowUp(interaction.application_id, interaction.token, `Scheduled! A random song will be posted daily at ${h}:${m} ${tzAbbr}`);
+    })().catch(err => {
+      console.error(JSON.stringify({ event: 'schedule_set_error', error: String(err) }));
+    }),
+  );
 
   return deferred;
 }
+
 
 async function handleScheduleCancel(interaction: DiscordInteraction, env: Env): Promise<Response> {
   const guildId = interaction.guild_id;
@@ -200,19 +208,19 @@ async function handleInteraction(
   env: Env,
   waitUntil: (p: Promise<void>) => void,
 ): Promise<Response> {
-    // Discord interaction types: 1 = PING, 3 = APPLICATION_COMMAND
+    // Discord interaction types: 1 = PING, 2 = APPLICATION_COMMAND
   if (interaction.type === 1) {
       return pongResponse();
       }
 
-  if (interaction.type !== 3) {
+  if (interaction.type !== 2) {
       return ephemeralResponse(`Unsupported interaction type: ${interaction.type}`);
       }
 
   const { name } = interaction.data;
 
   if (name === 'random' || name === 'gacha') {
-      return handleRandom(env);
+      return handleRandom(interaction, env, waitUntil);
       }
 
   if (name === 'schedule') {

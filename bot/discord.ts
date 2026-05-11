@@ -2,10 +2,12 @@
 
 export interface DiscordInteraction {
   type: number;
+  application_id: string;
+  token: string;
   data: {
     name?: string;
     options?: Array<{ name: string; value: unknown }>;
-   };
+     };
   guild_id?: string;
   channel_id?: string;
 }
@@ -79,16 +81,16 @@ export function ephemeralResponse(content: string): Response {
 }
 
 // ─── Deferred response + follow-up ────────────────────────────────────────────
-// For slash commands, you must send a DeferredChannelMessageWithSource (type=1)
-// as the HTTP response to the original interaction POST. The response Location
-// header contains the webhook URL for follow-up messages.
+// Send type 5 (DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE) as the HTTP response within 3s.
+// Follow-up via POST /webhooks/{application.id}/{interaction.token}/messages/@original.
 
 export function deferredResponse(): Response {
-  return new Response(jsonBody(1), { headers: { 'Content-Type': 'application/json' } });
+  return new Response(jsonBody(5), { headers: { 'Content-Type': 'application/json' } });
 }
 
 export async function postFollowUp(
-  locationUrl: string,
+  applicationId: string,
+  token: string,
   content?: string,
   embeds?: Embed[],
   flags?: number,
@@ -98,7 +100,7 @@ export async function postFollowUp(
   if (embeds?.length) body.embeds = embeds;
   if (flags !== undefined) body.flags = flags;
 
-  const res = await fetch(`${locationUrl}/messages`, {
+  const res = await fetch(`https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
