@@ -88,10 +88,13 @@ async function handleScheduleSet(
   env: Env,
   waitUntil: (p: Promise<void>) => void,
 ): Promise<Response> {
-  const opts = interaction.data.options as Array<{ name: string; value: unknown }>;
-  const hour = Number(opts.find(o => o.name === 'hour')?.value);
-  const minute = Number(opts.find(o => o.name === 'minute')?.value);
-  const timezone = (opts.find(o => o.name === 'timezone')?.value as string) ?? 'UTC';
+  // Discord nests subcommand options under data.options[0].options
+  type SubOpt = { name: string; value: unknown };
+  type SubCmd = { name: string; options?: SubOpt[] };
+  const subOpts = (interaction.data.options as SubCmd[])?.[0]?.options ?? [];
+  const hour = Number(subOpts.find(o => o.name === 'hour')?.value);
+  const minute = Number(subOpts.find(o => o.name === 'minute')?.value);
+  const timezone = (subOpts.find(o => o.name === 'timezone')?.value as string) ?? 'UTC';
 
   if (!Number.isInteger(hour) || hour < 0 || hour > 23) {
       return ephemeralResponse('Hour must be 0–23');
@@ -152,54 +155,57 @@ async function handleScheduleCancel(interaction: DiscordInteraction, env: Env): 
   const guildId = interaction.guild_id;
   const channelId = interaction.channel_id;
   if (!guildId || !channelId) {
-      return ephemeralResponse('This command can only be used in a server channel');
-      }
+    return ephemeralResponse('This command can only be used in a server channel');
+  }
 
-  const { results } = await env.DB.prepare(
-        `SELECT webhook_url FROM schedules WHERE guild_id = ? AND channel_id = ? AND active = 1`,
-      ).bind(guildId, channelId).all<{ webhook_url: string }>();
-
-  if (!results.length) {
-      return ephemeralResponse('No active schedule found for this channel');
-      }
-
-  const webhookUrl = results[0].webhook_url;
-
-    // Deactivate in DB
-  await env.DB.prepare(
-        `UPDATE schedules SET active = 0, updated_at = unixepoch() WHERE guild_id = ? AND channel_id = ?`,
-      ).bind(guildId, channelId).run();
-
-    // Delete the webhook from Discord
   try {
-    await deleteWebhook(webhookUrl);
-    } catch {
-        // Best effort — schedule is already deactivated in DB
+    const { results } = await env.DB.prepare(
+      `SELECT webhook_url FROM schedules WHERE guild_id = ? AND channel_id = ? AND active = 1`,
+    ).bind(guildId, channelId).all<{ webhook_url: string }>();
+
+    if (!results.length) {
+      return ephemeralResponse('No active schedule found for this channel');
     }
 
-  return ephemeralResponse('Schedule cancelled');
+    const webhookUrl = results[0].webhook_url;
+
+    await env.DB.prepare(
+      `UPDATE schedules SET active = 0, updated_at = unixepoch() WHERE guild_id = ? AND channel_id = ?`,
+    ).bind(guildId, channelId).run();
+
+    deleteWebhook(webhookUrl).catch(() => {}); // best effort, schedule already deactivated
+    return ephemeralResponse('Schedule cancelled');
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'schedule_cancel_error', error: String(err) }));
+    return ephemeralResponse('Something went wrong. Please try again.');
+  }
 }
 
 async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): Promise<Response> {
   const guildId = interaction.guild_id;
   const channelId = interaction.channel_id;
   if (!guildId || !channelId) {
-      return ephemeralResponse('This command can only be used in a server channel');
-      }
+    return ephemeralResponse('This command can only be used in a server channel');
+  }
 
-  const { results } = await env.DB.prepare(
-        `SELECT schedule_hour, schedule_minute, timezone, active FROM schedules WHERE guild_id = ? AND channel_id = ?`,
-      ).bind(guildId, channelId).all<ScheduleRow>();
+  try {
+    const { results } = await env.DB.prepare(
+      `SELECT schedule_hour, schedule_minute, timezone, active FROM schedules WHERE guild_id = ? AND channel_id = ?`,
+    ).bind(guildId, channelId).all<ScheduleRow>();
 
-  if (!results.length || !results[0].active) {
+    if (!results.length || !results[0].active) {
       return ephemeralResponse('No active schedule for this channel. Use /schedule set to configure one.');
-      }
+    }
 
-  const s = results[0];
-  const tzAbbr = formatTzAbbr(s.timezone);
-  const h = String(s.schedule_hour).padStart(2, '0');
-  const m = String(s.schedule_minute).padStart(2, '0');
-  return ephemeralResponse(`Currently posting daily at ${h}:${m} ${tzAbbr} (${s.timezone})`);
+    const s = results[0];
+    const tzAbbr = formatTzAbbr(s.timezone);
+    const h = String(s.schedule_hour).padStart(2, '0');
+    const m = String(s.schedule_minute).padStart(2, '0');
+    return ephemeralResponse(`Currently posting daily at ${h}:${m} ${tzAbbr} (${s.timezone})`);
+  } catch (err) {
+    console.error(JSON.stringify({ event: 'schedule_status_error', error: String(err) }));
+    return ephemeralResponse('Something went wrong. Please try again.');
+  }
 }
 
 // ─── Interaction router ───────────────────────────────────────────────────────
