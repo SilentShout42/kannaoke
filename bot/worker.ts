@@ -120,7 +120,7 @@ async function handleScheduleSet(
       await postFollowUp(
         interaction.application_id,
         interaction.token,
-        `Scheduled daily at **${h}:${m} ${timezone} time** · First post: <t:${nextFireAt}:F> (<t:${nextFireAt}:R>)`,
+        `Scheduled daily at **${h}:${m} ${timezone}** time · First post: <t:${nextFireAt}:F> (<t:${nextFireAt}:R>)`,
         undefined,
         64,
       );
@@ -177,7 +177,7 @@ async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): 
     const h = String(s.schedule_hour).padStart(2, '0');
     const m = String(s.schedule_minute).padStart(2, '0');
     return ephemeralResponse(
-      `Scheduled daily at **${h}:${m} ${s.timezone} time** · Next post: <t:${s.next_fire_at}:F> (<t:${s.next_fire_at}:R>)`,
+      `Scheduled daily at **${h}:${m} ${s.timezone}** time · Next post: <t:${s.next_fire_at}:F> (<t:${s.next_fire_at}:R>)`,
     );
   } catch (err) {
     console.error(JSON.stringify({ event: 'schedule_status_error', error: String(err) }));
