@@ -146,6 +146,7 @@ export default function App() {
       const vParam = urlParams.get('v');
       const tParam = urlParams.get('t');
       const qParam = urlParams.get('q')?.trim() ?? '';
+      const playParam = urlParams.get('autoplay') === '1';
       const matched = vParam && tParam
         ? data
           .filter(p => p.videoId === vParam)
@@ -165,10 +166,10 @@ export default function App() {
 
       const initial = matched ?? queryRandom ?? random;
       if (matched) {
-        selectEntry(initial, false, false);
+        selectEntry(initial, playParam, false);
       } else {
         runDiceRoll(() => {
-          selectEntry(initial, false, false);
+          selectEntry(initial, playParam, false);
         });
       }
 
@@ -183,6 +184,7 @@ export default function App() {
             start: entry.startTime,
           };
           if (entry.endTime != null) playerVars.end = entry.endTime;
+          if (playParam) playerVars.autoplay = 1;
           ytPlayerRef.current = new window.YT.Player('yt-player', {
             videoId: entry.videoId,
             playerVars,

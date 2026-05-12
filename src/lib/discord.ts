@@ -2,7 +2,7 @@ import type { APIEmbed } from 'discord-api-types/v10';
 import type { SongEntry } from './songPicker';
 
 export function buildSongEmbed(song: SongEntry, baseUrl: string): APIEmbed {
-  const url = `${baseUrl}/?v=${encodeURIComponent(song.videoId)}&t=${encodeURIComponent(String(song.startTime))}`;
+  const url = `${baseUrl}/?v=${encodeURIComponent(song.videoId)}&t=${encodeURIComponent(String(song.startTime))}&autoplay=1`;
   return {
     title: song.title,
     url,
