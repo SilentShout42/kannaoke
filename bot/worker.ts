@@ -7,6 +7,7 @@ import {
   pongResponse,
   ephemeralResponse,
   deferredResponse,
+  autocompleteResponse,
   postFollowUp,
   createChannelWebhook,
   deleteWebhook,
@@ -33,26 +34,6 @@ interface Env {
   BASE_URL: string;
 }
 
-function validateTimezone(tz: string): boolean {
-  try {
-      new Intl.DateTimeFormat('en', { timeZone: tz });
-      return true;
-     } catch {
-     return false;
-     }
-}
-
-function formatTzAbbr(timezone: string): string {
-  try {
-    const tzAbbr = new Intl.DateTimeFormat('en-US', {
-        timeZone: timezone,
-        timeZoneName: 'short',
-       }).formatToParts(new Date()).find(p => p.type === 'timeZoneName')?.value;
-    return tzAbbr ?? timezone;
-    } catch {
-    return timezone;
-    }
-}
 
 // ─── Command handlers ──────────────────────────────────────────────────────────
 
@@ -94,36 +75,35 @@ async function handleScheduleSet(
   const subOpts = (interaction.data.options as SubCmd[])?.[0]?.options ?? [];
   const hour = Number(subOpts.find(o => o.name === 'hour')?.value);
   const minute = Number(subOpts.find(o => o.name === 'minute')?.value);
-  const timezone = (subOpts.find(o => o.name === 'timezone')?.value as string) ?? 'UTC';
+  const timezone = String(subOpts.find(o => o.name === 'timezone')?.value ?? 'UTC');
 
   if (!Number.isInteger(hour) || hour < 0 || hour > 23) {
-      return ephemeralResponse('Hour must be 0–23');
-       }
+    return ephemeralResponse('Hour must be 0–23');
+  }
   if (!Number.isInteger(minute) || minute < 0 || minute > 59) {
-      return ephemeralResponse('Minute must be 0–59');
-       }
-  if (!validateTimezone(timezone)) {
-      return ephemeralResponse('Invalid timezone. Use IANA format (e.g., America/New_York)');
-       }
+    return ephemeralResponse('Minute must be 0–59');
+  }
+
+  // Validate timezone — Intl.supportedValuesOf gives us the canonical list
+  const validTimezones: string[] = Intl.supportedValuesOf('timeZone');
+  if (!validTimezones.includes(timezone)) {
+    return ephemeralResponse(`Unknown timezone: ${timezone}. Use the autocomplete suggestions.`);
+  }
 
   const guildId = interaction.guild_id;
   const channelId = interaction.channel_id;
   if (!guildId || !channelId) {
-      return ephemeralResponse('This command can only be used in a server channel');
-       }
+    return ephemeralResponse('This command can only be used in a server channel');
+  }
 
   // Return deferred response immediately, then do async work in background
   const deferred = deferredResponse();
 
   waitUntil(
     (async () => {
-      // Create a webhook in this channel for scheduled posts
       const newWebhookUrl = await createChannelWebhook(channelId, env.DISCORD_BOT_TOKEN, 'Kannaoke Bot');
-
-      // Compute next fire time
       const nextFireAt = computeNextFireAt(hour, minute, timezone);
 
-      // Upsert schedule
       await env.DB.prepare(
         `INSERT INTO schedules (guild_id, channel_id, webhook_url, schedule_hour, schedule_minute, timezone, next_fire_at, active, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, 1, unixepoch())
@@ -137,10 +117,13 @@ async function handleScheduleSet(
           updated_at = unixepoch()`,
         ).bind(guildId, channelId, newWebhookUrl, hour, minute, timezone, nextFireAt).run();
 
-      const tzAbbr = formatTzAbbr(timezone);
       const h = String(hour).padStart(2, '0');
       const m = String(minute).padStart(2, '0');
-      await postFollowUp(interaction.application_id, interaction.token, `Scheduled! A random song will be posted daily at ${h}:${m} ${tzAbbr}`);
+      await postFollowUp(
+        interaction.application_id,
+        interaction.token,
+        `Scheduled daily at **${h}:${m} ${timezone}** · First post: <t:${nextFireAt}:F> (<t:${nextFireAt}:R>)`,
+      );
     })().catch(async err => {
       console.error(JSON.stringify({ event: 'schedule_set_error', error: String(err) }));
       await postFollowUp(interaction.application_id, interaction.token, `Failed: ${String(err)}`, undefined, 64).catch(() => {});
@@ -190,7 +173,7 @@ async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): 
 
   try {
     const { results } = await env.DB.prepare(
-      `SELECT schedule_hour, schedule_minute, timezone, active FROM schedules WHERE guild_id = ? AND channel_id = ?`,
+      `SELECT schedule_hour, schedule_minute, next_fire_at, active FROM schedules WHERE guild_id = ? AND channel_id = ?`,
     ).bind(guildId, channelId).all<ScheduleRow>();
 
     if (!results.length || !results[0].active) {
@@ -198,14 +181,35 @@ async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): 
     }
 
     const s = results[0];
-    const tzAbbr = formatTzAbbr(s.timezone);
     const h = String(s.schedule_hour).padStart(2, '0');
     const m = String(s.schedule_minute).padStart(2, '0');
-    return ephemeralResponse(`Currently posting daily at ${h}:${m} ${tzAbbr} (${s.timezone})`);
+    return ephemeralResponse(
+      `Scheduled daily at **${h}:${m} ${s.timezone}** · Next post: <t:${s.next_fire_at}:F> (<t:${s.next_fire_at}:R>)`,
+    );
   } catch (err) {
     console.error(JSON.stringify({ event: 'schedule_status_error', error: String(err) }));
     return ephemeralResponse('Something went wrong. Please try again.');
   }
+}
+
+// ─── Autocomplete handler ─────────────────────────────────────────────────────
+
+function handleAutocomplete(interaction: DiscordInteraction): Response {
+  type SubOpt = { name: string; value: unknown; focused?: boolean };
+  type SubCmd = { name: string; options?: SubOpt[] };
+  const subOpts = (interaction.data.options as SubCmd[])?.[0]?.options ?? [];
+  const focused = subOpts.find(o => o.focused);
+
+  if (focused?.name === 'timezone') {
+    const query = String(focused.value ?? '').toLowerCase();
+    const allZones: string[] = Intl.supportedValuesOf('timeZone');
+    const matches = query
+      ? allZones.filter(z => z.toLowerCase().includes(query)).slice(0, 25)
+      : allZones.slice(0, 25);
+    return autocompleteResponse(matches.map(z => ({ name: z, value: z })));
+  }
+
+  return autocompleteResponse([]);
 }
 
 // ─── Interaction router ───────────────────────────────────────────────────────
@@ -217,6 +221,10 @@ async function handleInteraction(
 ): Promise<Response> {
   if (interaction.type === InteractionType.PING) {
       return pongResponse();
+      }
+
+  if (interaction.type === InteractionType.APPLICATION_COMMAND_AUTOCOMPLETE) {
+      return handleAutocomplete(interaction);
       }
 
   if (interaction.type !== InteractionType.APPLICATION_COMMAND) {
