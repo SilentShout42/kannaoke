@@ -1,8 +1,31 @@
-import { verifyKey, InteractionResponseType, InteractionResponseFlags } from 'discord-interactions';
+import { InteractionResponseType, InteractionResponseFlags } from 'discord-interactions';
 import type { APIEmbed } from 'discord-api-types/v10';
 
-export { verifyKey };
 export type { APIEmbed };
+
+// ─── Ed25519 verification ─────────────────────────────────────────────────────
+// Discord sends the public key and signature as hex strings.
+// Cloudflare Workers require the algorithm name 'Ed25519' (no namedCurve).
+
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < hex.length; i += 2) bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16);
+  return bytes;
+}
+
+export async function verifyKey(
+  body: Uint8Array,
+  signature: string,
+  timestamp: string,
+  publicKey: string,
+): Promise<boolean> {
+  const message = new Uint8Array(timestamp.length + body.length);
+  message.set(new TextEncoder().encode(timestamp));
+  message.set(body, timestamp.length);
+
+  const key = await crypto.subtle.importKey('raw', hexToBytes(publicKey), 'Ed25519', false, ['verify']);
+  return crypto.subtle.verify('Ed25519', key, hexToBytes(signature), message);
+}
 
 export interface DiscordInteraction {
   type: number;
