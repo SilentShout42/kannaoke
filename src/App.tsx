@@ -31,6 +31,8 @@ declare global {
 interface YTPlayer {
   loadVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
   cueVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
+  playVideo(): void;
+  unMute(): void;
 }
 
 function videoParams(entry: Performance) {
@@ -184,7 +186,11 @@ export default function App() {
             start: entry.startTime,
           };
           if (entry.endTime != null) playerVars.end = entry.endTime;
-          if (playParam) playerVars.autoplay = 1;
+          if (playParam) {
+            // Muted autoplay is universally permitted; unmute in onReady after playback starts.
+            playerVars.autoplay = 1;
+            playerVars.mute = 1;
+          }
           ytPlayerRef.current = new window.YT.Player('yt-player', {
             videoId: entry.videoId,
             playerVars,
@@ -192,6 +198,10 @@ export default function App() {
               onReady() {
                 ytReadyRef.current = true;
                 setRolling(false);
+                if (playParam) {
+                  ytPlayerRef.current!.playVideo();
+                  ytPlayerRef.current!.unMute();
+                }
                 if (pendingRef.current) {
                   ytPlayerRef.current!.loadVideoById(videoParams(pendingRef.current));
                   pendingRef.current = null;
