@@ -1,3 +1,4 @@
+import Fuse from 'fuse.js';
 import { pickRandomSong, type SongEntry } from '../src/lib/songPicker';
 import { computeNextFireAt } from '../src/lib/schedule';
 import { buildSongEmbed } from '../src/lib/discord';
@@ -181,36 +182,16 @@ async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): 
   }
 }
 
-// ─── Autocomplete handler ─────────────────────────────────────────────────────
+// ─── Timezone autocomplete ────────────────────────────────────────────────────
 
-function fuzzyFilterTimezones(query: string, zones: string[]): string[] {
-  if (!query) return zones.slice(0, 25);
-
-  const q = query.toLowerCase();
-  type Scored = { zone: string; score: number };
-
-  const scored: Scored[] = [];
-  for (const zone of zones) {
-    const z = zone.toLowerCase();
-    if (z.startsWith(q)) {
-      scored.push({ zone, score: 0 });
-    } else if (z.includes(q)) {
-      scored.push({ zone, score: 1 });
-    } else {
-      // Fuzzy: all query chars appear in order
-      let pos = 0;
-      let matched = true;
-      for (const ch of q) {
-        const idx = z.indexOf(ch, pos);
-        if (idx === -1) { matched = false; break; }
-        pos = idx + 1;
-      }
-      if (matched) scored.push({ zone, score: 2 });
-    }
-  }
-
-  return scored.sort((a, b) => a.score - b.score).slice(0, 25).map(s => s.zone);
-}
+const tzFuse = (() => {
+  const data = Intl.supportedValuesOf('timeZone').map(zone => ({
+    zone,
+    full: zone.replace(/_/g, ' '),
+    city: zone.split('/').at(-1)!.replace(/_/g, ' '),
+  }));
+  return new Fuse(data, { keys: ['full', 'city'], threshold: 0.3, minMatchCharLength: 2 });
+})();
 
 function handleAutocomplete(interaction: DiscordInteraction): Response {
   type SubOpt = { name: string; value: unknown; focused?: boolean };
@@ -220,7 +201,9 @@ function handleAutocomplete(interaction: DiscordInteraction): Response {
 
   if (focused?.name === 'timezone') {
     const query = String(focused.value ?? '');
-    const zones = fuzzyFilterTimezones(query, Intl.supportedValuesOf('timeZone'));
+    const zones = query
+      ? tzFuse.search(query).slice(0, 25).map(r => r.item.zone)
+      : Intl.supportedValuesOf('timeZone').slice(0, 25);
     return autocompleteResponse(zones.map(z => ({ name: z, value: z })));
   }
 
