@@ -75,7 +75,7 @@ async function handleScheduleSet(
   const subOpts = (interaction.data.options as SubCmd[])?.[0]?.options ?? [];
   const hour = Number(subOpts.find(o => o.name === 'hour')?.value);
   const minute = Number(subOpts.find(o => o.name === 'minute')?.value);
-  const timezone = String(subOpts.find(o => o.name === 'timezone')?.value ?? 'UTC');
+  const timezone = String(subOpts.find(o => o.name === 'timezone')?.value);
 
   if (!Number.isInteger(hour) || hour < 0 || hour > 23) {
     return ephemeralResponse('Hour must be 0–23');
@@ -194,6 +194,35 @@ async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): 
 
 // ─── Autocomplete handler ─────────────────────────────────────────────────────
 
+function fuzzyFilterTimezones(query: string, zones: string[]): string[] {
+  if (!query) return zones.slice(0, 25);
+
+  const q = query.toLowerCase();
+  type Scored = { zone: string; score: number };
+
+  const scored: Scored[] = [];
+  for (const zone of zones) {
+    const z = zone.toLowerCase();
+    if (z.startsWith(q)) {
+      scored.push({ zone, score: 0 });
+    } else if (z.includes(q)) {
+      scored.push({ zone, score: 1 });
+    } else {
+      // Fuzzy: all query chars appear in order
+      let pos = 0;
+      let matched = true;
+      for (const ch of q) {
+        const idx = z.indexOf(ch, pos);
+        if (idx === -1) { matched = false; break; }
+        pos = idx + 1;
+      }
+      if (matched) scored.push({ zone, score: 2 });
+    }
+  }
+
+  return scored.sort((a, b) => a.score - b.score).slice(0, 25).map(s => s.zone);
+}
+
 function handleAutocomplete(interaction: DiscordInteraction): Response {
   type SubOpt = { name: string; value: unknown; focused?: boolean };
   type SubCmd = { name: string; options?: SubOpt[] };
@@ -201,12 +230,9 @@ function handleAutocomplete(interaction: DiscordInteraction): Response {
   const focused = subOpts.find(o => o.focused);
 
   if (focused?.name === 'timezone') {
-    const query = String(focused.value ?? '').toLowerCase();
-    const allZones: string[] = Intl.supportedValuesOf('timeZone');
-    const matches = query
-      ? allZones.filter(z => z.toLowerCase().includes(query)).slice(0, 25)
-      : allZones.slice(0, 25);
-    return autocompleteResponse(matches.map(z => ({ name: z, value: z })));
+    const query = String(focused.value ?? '');
+    const zones = fuzzyFilterTimezones(query, Intl.supportedValuesOf('timeZone'));
+    return autocompleteResponse(zones.map(z => ({ name: z, value: z })));
   }
 
   return autocompleteResponse([]);

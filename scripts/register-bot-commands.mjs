@@ -36,7 +36,7 @@ const commands = [
         options: [
           { name: 'hour', description: 'Hour (0-23)', type: 4, required: true, min_value: 0, max_value: 23 },
           { name: 'minute', description: 'Minute (0-59)', type: 4, required: true, min_value: 0, max_value: 59 },
-          { name: 'timezone', description: 'Timezone (e.g. Asia/Tokyo)', type: 3, required: false, autocomplete: true },
+          { name: 'timezone', description: 'Timezone (e.g. Asia/Tokyo)', type: 3, required: true, autocomplete: true },
          ],
        },
       { name: 'cancel', description: 'Disable scheduled posting', type: 1 },
