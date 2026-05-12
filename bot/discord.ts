@@ -64,7 +64,7 @@ export function ephemeralResponse(content: string): Response {
 
 // ─── Deferred response + follow-up ────────────────────────────────────────────
 // Send DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE as the HTTP response within 3s.
-// Edit the original via PATCH /webhooks/{application.id}/{interaction.token}/messages/@original.
+// Follow up via POST /webhooks/{application.id}/{interaction.token}.
 
 export function deferredResponse(): Response {
   return new Response(jsonBody(InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE), { headers: { 'Content-Type': 'application/json' } });
@@ -82,8 +82,8 @@ export async function postFollowUp(
   if (embeds?.length) body.embeds = embeds;
   if (flags !== undefined) body.flags = flags;
 
-  const res = await fetch(`https://discord.com/api/v10/webhooks/${applicationId}/${token}/messages/@original`, {
-    method: 'PATCH',
+  const res = await fetch(`https://discord.com/api/v10/webhooks/${applicationId}/${token}`, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
