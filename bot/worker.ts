@@ -134,8 +134,7 @@ async function handleScheduleSet(
           timezone = excluded.timezone,
           next_fire_at = excluded.next_fire_at,
           active = 1,
-          updated_at = unixepoch()
-        WHERE excluded.guild_id = schedules.guild_id AND excluded.channel_id = schedules.channel_id`,
+          updated_at = unixepoch()`,
         ).bind(guildId, channelId, newWebhookUrl, hour, minute, timezone, nextFireAt).run();
 
       const tzAbbr = formatTzAbbr(timezone);
