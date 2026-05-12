@@ -142,8 +142,9 @@ async function handleScheduleSet(
       const h = String(hour).padStart(2, '0');
       const m = String(minute).padStart(2, '0');
       await postFollowUp(interaction.application_id, interaction.token, `Scheduled! A random song will be posted daily at ${h}:${m} ${tzAbbr}`);
-    })().catch(err => {
+    })().catch(async err => {
       console.error(JSON.stringify({ event: 'schedule_set_error', error: String(err) }));
+      await postFollowUp(interaction.application_id, interaction.token, `Failed: ${String(err)}`, undefined, 64).catch(() => {});
     }),
   );
 

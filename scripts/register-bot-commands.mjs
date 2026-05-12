@@ -26,6 +26,8 @@ const commands = [
   {
     name: 'schedule',
     description: 'Manage daily scheduled song posts',
+    integration_types: [0], // guild install only
+    contexts: [0],          // guild channels only
     options: [
       {
         name: 'set',

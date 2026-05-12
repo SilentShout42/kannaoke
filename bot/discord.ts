@@ -42,7 +42,7 @@ export interface DiscordInteraction {
 // ─── Response builders ────────────────────────────────────────────────────────
 
 function jsonBody(type: number, data?: object): string {
-  return JSON.stringify({ type, ...(data ?? {}) });
+  return JSON.stringify({ type, ...(data ? { data } : {}) });
 }
 
 export function pongResponse(): Response {
