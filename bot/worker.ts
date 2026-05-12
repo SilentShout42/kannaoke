@@ -8,6 +8,7 @@ import {
   pongResponse,
   ephemeralResponse,
   deferredResponse,
+  ephemeralDeferredResponse,
   autocompleteResponse,
   postFollowUp,
   sendChannelMessage,
@@ -96,7 +97,7 @@ async function handleScheduleSet(
   }
 
   // Return deferred response immediately, then do async work in background
-  const deferred = deferredResponse();
+  const deferred = ephemeralDeferredResponse();
 
   waitUntil(
     (async () => {
@@ -120,6 +121,8 @@ async function handleScheduleSet(
         interaction.application_id,
         interaction.token,
         `Scheduled daily at **${h}:${m} ${timezone} time** · First post: <t:${nextFireAt}:F> (<t:${nextFireAt}:R>)`,
+        undefined,
+        64,
       );
     })().catch(async err => {
       console.error(JSON.stringify({ event: 'schedule_set_error', error: String(err) }));

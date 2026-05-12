@@ -70,6 +70,10 @@ export function deferredResponse(): Response {
   return new Response(jsonBody(InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE), { headers: { 'Content-Type': 'application/json' } });
 }
 
+export function ephemeralDeferredResponse(): Response {
+  return new Response(jsonBody(InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE, { flags: InteractionResponseFlags.EPHEMERAL }), { headers: { 'Content-Type': 'application/json' } });
+}
+
 export function autocompleteResponse(choices: Array<{ name: string; value: string }>): Response {
   return new Response(JSON.stringify({ type: 8, data: { choices } }), { headers: { 'Content-Type': 'application/json' } });
 }
