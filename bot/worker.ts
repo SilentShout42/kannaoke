@@ -1,6 +1,6 @@
 import { pickRandomSong, type SongEntry } from '../src/lib/songPicker';
 import { computeNextFireAt } from '../src/lib/schedule';
-import { buildSongEmbed, postToWebhook } from '../src/lib/discord';
+import { buildSongEmbed } from '../src/lib/discord';
 import { InteractionType } from 'discord-interactions';
 import {
   verifyKey,
@@ -9,8 +9,7 @@ import {
   deferredResponse,
   autocompleteResponse,
   postFollowUp,
-  createChannelWebhook,
-  deleteWebhook,
+  sendChannelMessage,
   type DiscordInteraction,
   type APIEmbed,
 } from './discord';
@@ -19,7 +18,6 @@ interface ScheduleRow {
   id: number;
   guild_id: string;
   channel_id: string;
-  webhook_url: string;
   schedule_hour: number;
   schedule_minute: number;
   timezone: string;
@@ -101,21 +99,19 @@ async function handleScheduleSet(
 
   waitUntil(
     (async () => {
-      const newWebhookUrl = await createChannelWebhook(channelId, env.DISCORD_BOT_TOKEN, 'Kannaoke Bot');
       const nextFireAt = computeNextFireAt(hour, minute, timezone);
 
       await env.DB.prepare(
-        `INSERT INTO schedules (guild_id, channel_id, webhook_url, schedule_hour, schedule_minute, timezone, next_fire_at, active, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 1, unixepoch())
+        `INSERT INTO schedules (guild_id, channel_id, schedule_hour, schedule_minute, timezone, next_fire_at, active, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, 1, unixepoch())
         ON CONFLICT(guild_id, channel_id) DO UPDATE SET
-          webhook_url = excluded.webhook_url,
           schedule_hour = excluded.schedule_hour,
           schedule_minute = excluded.schedule_minute,
           timezone = excluded.timezone,
           next_fire_at = excluded.next_fire_at,
           active = 1,
           updated_at = unixepoch()`,
-        ).bind(guildId, channelId, newWebhookUrl, hour, minute, timezone, nextFireAt).run();
+        ).bind(guildId, channelId, hour, minute, timezone, nextFireAt).run();
 
       const h = String(hour).padStart(2, '0');
       const m = String(minute).padStart(2, '0');
@@ -142,21 +138,14 @@ async function handleScheduleCancel(interaction: DiscordInteraction, env: Env): 
   }
 
   try {
-    const { results } = await env.DB.prepare(
-      `SELECT webhook_url FROM schedules WHERE guild_id = ? AND channel_id = ? AND active = 1`,
-    ).bind(guildId, channelId).all<{ webhook_url: string }>();
+    const { meta } = await env.DB.prepare(
+      `UPDATE schedules SET active = 0, updated_at = unixepoch() WHERE guild_id = ? AND channel_id = ? AND active = 1`,
+    ).bind(guildId, channelId).run();
 
-    if (!results.length) {
+    if (!meta.changes) {
       return ephemeralResponse('No active schedule found for this channel');
     }
 
-    const webhookUrl = results[0].webhook_url;
-
-    await env.DB.prepare(
-      `UPDATE schedules SET active = 0, updated_at = unixepoch() WHERE guild_id = ? AND channel_id = ?`,
-    ).bind(guildId, channelId).run();
-
-    deleteWebhook(webhookUrl).catch(() => {}); // best effort, schedule already deactivated
     return ephemeralResponse('Schedule cancelled');
   } catch (err) {
     console.error(JSON.stringify({ event: 'schedule_cancel_error', error: String(err) }));
@@ -318,7 +307,7 @@ async function fireSchedule(schedule: ScheduleRow, performances: SongEntry[], en
   if (!song) return;
 
   const embed = buildSongEmbed(song, env.BASE_URL);
-  await postToWebhook(schedule.webhook_url, embed);
+  await sendChannelMessage(schedule.channel_id, env.DISCORD_BOT_TOKEN, embed);
 
   const nextFireAt = computeNextFireAt(schedule.schedule_hour, schedule.schedule_minute, schedule.timezone);
   await env.DB.prepare(

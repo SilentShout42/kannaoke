@@ -97,39 +97,19 @@ export async function postFollowUp(
   }
 }
 
-// ─── Channel webhook CRUD ─────────────────────────────────────────────────────
+// ─── Channel message ──────────────────────────────────────────────────────────
 
-export async function createChannelWebhook(
-  channelId: string,
-  botToken: string,
-  name: string,
-): Promise<string> {
-  const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/webhooks`, {
+export async function sendChannelMessage(channelId: string, botToken: string, embed: APIEmbed): Promise<void> {
+  const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
     method: 'POST',
     headers: {
       Authorization: `Bot ${botToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ embeds: [embed] }),
   });
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`Create webhook failed: ${res.status} ${text}`);
-  }
-  const data = await res.json<{ id: string; token: string }>();
-  return `https://discord.com/api/webhooks/${data.id}/${data.token}`;
-}
-
-export async function deleteWebhook(webhookUrl: string): Promise<void> {
-  const match = webhookUrl.match(/\/webhooks\/(\d+)\/([\w-]+)/);
-  if (!match) throw new Error(`Invalid webhook URL: ${webhookUrl}`);
-  const [, id, token] = match;
-
-  const res = await fetch(`https://discord.com/api/v10/webhooks/${id}/${token}`, {
-    method: 'DELETE',
-  });
-  if (!res.ok && res.status !== 404) {
-    const text = await res.text();
-    throw new Error(`Delete webhook failed: ${res.status} ${text}`);
+    throw new Error(`Send message failed: ${res.status} ${text}`);
   }
 }
