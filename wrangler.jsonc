@@ -14,13 +14,6 @@
 		"enabled": true,
 		"head_sampling_rate": 1
 	},
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "kannaoke-db",
-			"database_id": "248ea7e4-cc9b-43ba-ac38-7bc01b1991c2"
-		},
-	],
 	"vars": {
 		"APP_BASE_URL": "https://kannaoke.oyasumi99.com"
 	}

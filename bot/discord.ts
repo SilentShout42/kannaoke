@@ -98,6 +98,8 @@ export async function postFollowUp(
 }
 
 // ─── Channel message ──────────────────────────────────────────────────────────
+// Required bot permissions in the target channel (invite URL permissions=19456):
+//   View Channel  (1024) + Send Messages (2048) + Embed Links (16384) = 19456
 
 export async function sendChannelMessage(channelId: string, botToken: string, embed: APIEmbed): Promise<void> {
   const res = await fetch(`https://discord.com/api/v10/channels/${channelId}/messages`, {
