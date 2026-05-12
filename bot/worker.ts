@@ -173,7 +173,7 @@ async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): 
 
   try {
     const { results } = await env.DB.prepare(
-      `SELECT schedule_hour, schedule_minute, next_fire_at, active FROM schedules WHERE guild_id = ? AND channel_id = ?`,
+      `SELECT schedule_hour, schedule_minute, timezone, next_fire_at, active FROM schedules WHERE guild_id = ? AND channel_id = ?`,
     ).bind(guildId, channelId).all<ScheduleRow>();
 
     if (!results.length || !results[0].active) {
