@@ -1,8 +1,9 @@
 import { pickRandomSong, type SongEntry } from '../src/lib/songPicker';
 import { computeNextFireAt } from '../src/lib/schedule';
 import { buildSongEmbed, postToWebhook } from '../src/lib/discord';
+import { InteractionType } from 'discord-interactions';
 import {
-  verifyInteraction,
+  verifyKey,
   pongResponse,
   ephemeralResponse,
   deferredResponse,
@@ -10,7 +11,7 @@ import {
   createChannelWebhook,
   deleteWebhook,
   type DiscordInteraction,
-  type Embed,
+  type APIEmbed,
 } from './discord';
 
 interface ScheduleRow {
@@ -70,7 +71,7 @@ async function handleRandom(interaction: DiscordInteraction, env: Env, waitUntil
         if (!song) {
           throw new Error('No songs available');
         }
-        const embed: Embed = buildSongEmbed(song, env.BASE_URL);
+        const embed: APIEmbed = buildSongEmbed(song, env.BASE_URL);
         await postFollowUp(interaction.application_id, interaction.token, undefined, [embed]);
       } catch (err) {
         await postFollowUp(interaction.application_id, interaction.token, String(err), undefined, 64);
@@ -208,12 +209,11 @@ async function handleInteraction(
   env: Env,
   waitUntil: (p: Promise<void>) => void,
 ): Promise<Response> {
-    // Discord interaction types: 1 = PING, 2 = APPLICATION_COMMAND
-  if (interaction.type === 1) {
+  if (interaction.type === InteractionType.PING) {
       return pongResponse();
       }
 
-  if (interaction.type !== 2) {
+  if (interaction.type !== InteractionType.APPLICATION_COMMAND) {
       return ephemeralResponse(`Unsupported interaction type: ${interaction.type}`);
       }
 
@@ -261,7 +261,7 @@ async function fetchHandler(
       return new Response('Missing signature headers', { status: 401 });
       }
 
-  const valid = await verifyInteraction(env.DISCORD_PUBLIC_KEY, signature, timestamp, bodyBytes);
+  const valid = await verifyKey(bodyBytes, signature, timestamp, env.DISCORD_PUBLIC_KEY);
   if (!valid) {
       console.log(JSON.stringify({ event: 'bad_signature', ip: request.headers.get('cf-ipCountry') }));
       return new Response('Unauthorized', { status: 401 });

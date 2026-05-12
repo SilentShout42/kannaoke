@@ -24,7 +24,7 @@ vi.mock('../src/lib/discord', () => ({
 }));
 
 vi.mock('./discord', () => ({
-  verifyInteraction: vi.fn().mockResolvedValue(true),
+  verifyKey: vi.fn().mockResolvedValue(true),
   pongResponse: vi.fn(() => new Response(JSON.stringify({ type: 1 }), { headers: { 'Content-Type': 'application/json' } })),
   ephemeralResponse: vi.fn((content) => new Response(JSON.stringify({ type: 4, content, flags: 64 }), { headers: { 'Content-Type': 'application/json' } })),
   deferredResponse: vi.fn(() => new Response(JSON.stringify({ type: 5 }), { headers: { 'Content-Type': 'application/json' } })),

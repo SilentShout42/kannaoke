@@ -1,16 +1,7 @@
+import type { APIEmbed } from 'discord-api-types/v10';
 import type { SongEntry } from './songPicker';
 
-interface DiscordEmbed {
-  title: string;
-  url: string;
-  description: string;
-  color: number;
-  thumbnail: { url: string };
-  footer: { text: string };
-  timestamp: string;
-}
-
-export function buildSongEmbed(song: SongEntry, baseUrl: string): DiscordEmbed {
+export function buildSongEmbed(song: SongEntry, baseUrl: string): APIEmbed {
   const url = `${baseUrl}/?v=${encodeURIComponent(song.videoId)}&t=${encodeURIComponent(String(song.startTime))}`;
   return {
     title: song.title,
@@ -23,7 +14,7 @@ export function buildSongEmbed(song: SongEntry, baseUrl: string): DiscordEmbed {
   };
 }
 
-export async function postToWebhook(webhookUrl: string, embed: DiscordEmbed): Promise<void> {
+export async function postToWebhook(webhookUrl: string, embed: APIEmbed): Promise<void> {
   const res = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
