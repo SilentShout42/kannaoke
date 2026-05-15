@@ -35,6 +35,22 @@ interface Env {
 }
 
 
+// ─── Permission helpers ──────────────────────────────────────────────────────────
+
+const REQUIRED_PERMISSIONS = [
+  { label: 'View Channel',  bit: 1024n },
+  { label: 'Send Messages', bit: 2048n },
+  { label: 'Embed Links',   bit: 16384n },
+] as const;
+
+function formatPermissions(appPermissions: string | undefined): string {
+  const perms = BigInt(appPermissions ?? '0');
+  const lines = REQUIRED_PERMISSIONS.map(({ label, bit }) =>
+    `${(perms & bit) === bit ? '✅' : '❌'} ${label}`
+  );
+  return '\n\n**Bot permissions in this channel:**\n' + lines.join('\n');
+}
+
 // ─── Command handlers ──────────────────────────────────────────────────────────
 
 async function handleRandom(interaction: DiscordInteraction, env: Env, waitUntil: (p: Promise<void>) => void): Promise<Response> {
@@ -170,14 +186,18 @@ async function handleScheduleStatus(interaction: DiscordInteraction, env: Env): 
     ).bind(guildId, channelId).all<ScheduleRow>();
 
     if (!results.length || !results[0].active) {
-      return ephemeralResponse('No active schedule for this channel. Use /schedule set to configure one.');
+      return ephemeralResponse(
+        'No active schedule for this channel. Use /schedule set to configure one.' +
+        formatPermissions(interaction.app_permissions)
+      );
     }
 
     const s = results[0];
     const h = String(s.schedule_hour).padStart(2, '0');
     const m = String(s.schedule_minute).padStart(2, '0');
     return ephemeralResponse(
-      `Scheduled daily at **${h}:${m} ${s.timezone}** time · Next post: <t:${s.next_fire_at}:F> (<t:${s.next_fire_at}:R>)`,
+      `Scheduled daily at **${h}:${m} ${s.timezone}** time · Next post: <t:${s.next_fire_at}:F> (<t:${s.next_fire_at}:R>)` +
+      formatPermissions(interaction.app_permissions)
     );
   } catch (err) {
     console.error(JSON.stringify({ event: 'schedule_status_error', error: String(err) }));

@@ -176,4 +176,98 @@ describe('bot worker', () => {
       expect(body.type).toBe(5); // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
     });
   });
+
+  describe('schedule status permissions', () => {
+    const statusSql = 'SELECT schedule_hour, schedule_minute, timezone, next_fire_at, active FROM schedules WHERE guild_id = ? AND channel_id = ?';
+
+    function makeStatusRequest(appPermissions?: string) {
+      return new Request('https://bot.test/api/interactions', {
+        method: 'POST',
+        body: JSON.stringify({
+          type: 2,
+          application_id: 'app1',
+          token: 'tok1',
+          guild_id: 'g1',
+          channel_id: 'c1',
+          app_permissions: appPermissions,
+          data: {
+            name: 'schedule',
+            options: [{ name: 'status', options: [] }],
+          },
+        }),
+        headers: {
+          'X-Signature-Ed25519': 'valid',
+          'X-Signature-Timestamp': '123',
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    const activeScheduleRow = {
+      schedule_hour: 9,
+      schedule_minute: 0,
+      timezone: 'Asia/Tokyo',
+      next_fire_at: 1700000000,
+      active: 1,
+    };
+
+    it('shows all green when all permissions are granted (active schedule)', async () => {
+      const db = makeDbMock({
+        [statusSql]: { all: vi.fn().mockResolvedValue({ results: [activeScheduleRow] }) },
+      });
+      const env = { DB: db } as any;
+
+      const resp = await worker.fetch(makeStatusRequest('19456'), env, mockCtx);
+      const body = JSON.parse(await resp.text());
+
+      expect(body.content).toContain('✅ View Channel');
+      expect(body.content).toContain('✅ Send Messages');
+      expect(body.content).toContain('✅ Embed Links');
+      expect(body.content).not.toContain('❌');
+    });
+
+    it('shows red for Embed Links when that permission is missing (active schedule)', async () => {
+      const db = makeDbMock({
+        [statusSql]: { all: vi.fn().mockResolvedValue({ results: [activeScheduleRow] }) },
+      });
+      const env = { DB: db } as any;
+
+      // 1024 (View Channel) + 2048 (Send Messages) — no Embed Links
+      const resp = await worker.fetch(makeStatusRequest('3072'), env, mockCtx);
+      const body = JSON.parse(await resp.text());
+
+      expect(body.content).toContain('✅ View Channel');
+      expect(body.content).toContain('✅ Send Messages');
+      expect(body.content).toContain('❌ Embed Links');
+    });
+
+    it('shows all red when app_permissions is absent', async () => {
+      const db = makeDbMock({
+        [statusSql]: { all: vi.fn().mockResolvedValue({ results: [activeScheduleRow] }) },
+      });
+      const env = { DB: db } as any;
+
+      const resp = await worker.fetch(makeStatusRequest(undefined), env, mockCtx);
+      const body = JSON.parse(await resp.text());
+
+      expect(body.content).toContain('❌ View Channel');
+      expect(body.content).toContain('❌ Send Messages');
+      expect(body.content).toContain('❌ Embed Links');
+    });
+
+    it('includes permission block even when no active schedule exists', async () => {
+      const db = makeDbMock({
+        [statusSql]: { all: vi.fn().mockResolvedValue({ results: [] }) },
+      });
+      const env = { DB: db } as any;
+
+      const resp = await worker.fetch(makeStatusRequest('19456'), env, mockCtx);
+      const body = JSON.parse(await resp.text());
+
+      expect(body.content).toContain('No active schedule');
+      expect(body.content).toContain('✅ View Channel');
+      expect(body.content).toContain('✅ Send Messages');
+      expect(body.content).toContain('✅ Embed Links');
+    });
+  });
 });

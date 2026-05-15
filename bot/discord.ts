@@ -37,6 +37,7 @@ export interface DiscordInteraction {
   };
   guild_id?: string;
   channel_id?: string;
+  app_permissions?: string;
 }
 
 // ─── Response builders ────────────────────────────────────────────────────────
