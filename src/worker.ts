@@ -49,12 +49,13 @@ export default {
         const videoUrl = `https://www.youtube.com/embed/${entry.videoId}?start=${entry.startTime}`;
         const ogAuthor = `yt:channel:UClxj3GlGphZVgd1SLYhZKmg`;
         const modified = injectMeta(html, {
-          title: `${entry.title} · ${entry.artist}`,
+          title: `${entry.title} — Kannaoke`,
           description: `${entry.videoDate} · ${entry.videoTitle}`,
           url: pageUrl,
-          ogImage,
+          ogImage: ogImage,
           videoUrl,
           ogAuthor,
+          thumbnailUrl: ogImage,
           });
         return new Response(modified, {
           headers: {
@@ -71,7 +72,7 @@ export default {
    },
 } satisfies ExportedHandler<Env>;
 
-export function injectMeta(html: string, meta: { title: string; description: string; url: string; ogImage?: string; videoUrl?: string; ogAuthor?: string }): string {
+export function injectMeta(html: string, meta: { title: string; description: string; url: string; ogImage?: string; videoUrl?: string; ogAuthor?: string; thumbnailUrl?: string }): string {
   const t = escHtml(meta.title);
   const d = escHtml(meta.description);
   const u = escHtml(meta.url);
@@ -94,6 +95,9 @@ export function injectMeta(html: string, meta: { title: string; description: str
     result += `<meta property="og:video:type" content="text/html" />`;
     result += `<meta property="og:video:width" content="1280" />`;
     result += `<meta property="og:video:height" content="720" />`;
+    if (meta.thumbnailUrl) {
+      result += `<meta property="og:video:thumbnail_url" content="${escHtml(meta.thumbnailUrl)}" />`;
+    }
   }
   if (meta.ogAuthor) {
     result = result.replace(/(<meta\s+property="og:author"\s+content=")[^"]*(")/i, `$1${escHtml(meta.ogAuthor)}$2`);

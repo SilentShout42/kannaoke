@@ -181,7 +181,7 @@ describe('worker fetch handler', () => {
       const resp = await worker.fetch(req, { ASSETS: assets } as never);
       const html = await resp.text();
       expect(html).toContain('<title>Song of the Ancients — Kannaoke</title>');
-      expect(html).toContain('Devola · NieR · 2024-08-03');
+      expect(html).toContain('2024-08-03 · Karaoke! Cute Duck Girl Singing for You!');
     }
   });
 
