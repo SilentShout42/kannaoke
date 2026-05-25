@@ -134,6 +134,21 @@ describe('injectMeta', () => {
     expect(r).toContain('content="&lt;desc&gt;"');
     expect(r).toContain('content="https://x.com/?a=1&amp;b=2"');
   });
+
+  it('does not inject video tags when videoUrl is omitted', () => {
+    const r = injectMeta(BASE_HTML, { title: 'Test', description: 'Desc', url: 'https://x.com/' });
+    expect(r).not.toContain('og:video');
+  });
+
+  it('does not inject og:image when ogImage is omitted', () => {
+    const r = injectMeta(BASE_HTML, { title: 'Test', description: 'Desc', url: 'https://x.com/' });
+    expect(r).not.toContain('og:image');
+  });
+
+  it('does not inject og:author when ogAuthor is omitted', () => {
+    const r = injectMeta(BASE_HTML, { title: 'Test', description: 'Desc', url: 'https://x.com/' });
+    expect(r).not.toContain('og:author');
+  });
 });
 
 describe('worker fetch handler', () => {
