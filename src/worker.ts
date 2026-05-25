@@ -45,10 +45,16 @@ export default {
         const htmlResp = await env.ASSETS.fetch(new Request(`${url.origin}/`));
         const html = await htmlResp.text();
         const pageUrl = `https://kannaoke.oyasumi99.com/?v=${encodeURIComponent(v)}&t=${encodeURIComponent(t)}`;
+        const ogImage = `https://i.ytimg.com/vi/${entry.videoId}/maxresdefault.jpg`;
+        const videoUrl = `https://www.youtube-nocookie.com/embed/${entry.videoId}?start=${entry.startTime}&rel=0&modestbranding=1`;
+        const ogAuthor = `yt:channel:UClxj3GlGphZVgd1SLYhZKmg`;
         const modified = injectMeta(html, {
           title: `${entry.title} — Kannaoke`,
           description: `${entry.artist} · ${entry.videoDate}`,
           url: pageUrl,
+          ogImage,
+          videoUrl,
+          ogAuthor,
           });
         return new Response(modified, {
           headers: {
@@ -65,11 +71,11 @@ export default {
    },
 } satisfies ExportedHandler<Env>;
 
-export function injectMeta(html: string, meta: { title: string; description: string; url: string }): string {
+export function injectMeta(html: string, meta: { title: string; description: string; url: string; ogImage?: string; videoUrl?: string; ogAuthor?: string }): string {
   const t = escHtml(meta.title);
   const d = escHtml(meta.description);
   const u = escHtml(meta.url);
-  return html
+  let result = html
      .replace(/(<title>)[^<]*(<\/title>)/, `$1${t}$2`)
      .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/i, `$1${d}$2`)
      .replace(/(<meta\s+property="og:title"\s+content=")[^"]*(")/i, `$1${t}$2`)
@@ -77,6 +83,21 @@ export function injectMeta(html: string, meta: { title: string; description: str
      .replace(/(<meta\s+property="og:url"\s+content=")[^"]*(")/i, `$1${u}$2`)
      .replace(/(<meta\s+name="twitter:title"\s+content=")[^"]*(")/i, `$1${t}$2`)
      .replace(/(<meta\s+name="twitter:description"\s+content=")[^"]*(")/i, `$1${d}$2`);
+
+  if (meta.ogImage) {
+    result = result.replace(/(<meta\s+property="og:image"\s+content=")[^"]*(")/i, `$1${escHtml(meta.ogImage)}$2`);
+  }
+  if (meta.videoUrl) {
+    result = result.replace(/(<meta\s+property="og:video"\s+content=")[^"]*(")/i, `$1${escHtml(meta.videoUrl)}$2`);
+    result += `<meta property="og:video:type" content="text/html" />`;
+    result += `<meta property="og:video:width" content="1280" />`;
+    result += `<meta property="og:video:height" content="720" />`;
+  }
+  if (meta.ogAuthor) {
+    result = result.replace(/(<meta\s+property="og:author"\s+content=")[^"]*(")/i, `$1${escHtml(meta.ogAuthor)}$2`);
+  }
+
+  return result;
 }
 
 export function escHtml(s: string): string {
