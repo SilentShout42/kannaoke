@@ -49,8 +49,8 @@ export default {
         const videoUrl = `https://www.youtube.com/embed/${entry.videoId}?start=${entry.startTime}`;
         const ogAuthor = `yt:channel:UClxj3GlGphZVgd1SLYhZKmg`;
         const modified = injectMeta(html, {
-          title: `${entry.title} — Kannaoke`,
-          description: `${entry.artist} · ${entry.videoDate}`,
+          title: `${entry.title} · ${entry.artist}`,
+          description: `${entry.videoDate} · ${entry.videoTitle}`,
           url: pageUrl,
           ogImage,
           videoUrl,
