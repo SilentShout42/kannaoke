@@ -46,7 +46,7 @@ export default {
         const html = await htmlResp.text();
         const pageUrl = `https://kannaoke.oyasumi99.com/?v=${encodeURIComponent(v)}&t=${encodeURIComponent(t)}`;
         const ogImage = `https://i.ytimg.com/vi/${entry.videoId}/maxresdefault.jpg`;
-        const videoUrl = `https://www.youtube-nocookie.com/embed/${entry.videoId}?start=${entry.startTime}&rel=0&modestbranding=1`;
+        const videoUrl = `https://www.youtube.com/embed/${entry.videoId}?start=${entry.startTime}&rel=0&modestbranding=1`;
         const ogAuthor = `yt:channel:UClxj3GlGphZVgd1SLYhZKmg`;
         const modified = injectMeta(html, {
           title: `${entry.title} — Kannaoke`,
