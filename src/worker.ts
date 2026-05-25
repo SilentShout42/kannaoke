@@ -46,7 +46,7 @@ export default {
         const html = await htmlResp.text();
         const pageUrl = `https://kannaoke.oyasumi99.com/?v=${encodeURIComponent(v)}&t=${encodeURIComponent(t)}`;
         const ogImage = `https://i.ytimg.com/vi/${entry.videoId}/maxresdefault.jpg`;
-        const videoUrl = `https://www.youtube.com/embed/${entry.videoId}?start=${entry.startTime}&rel=0&modestbranding=1`;
+        const videoUrl = `https://www.youtube.com/embed/${entry.videoId}?start=${entry.startTime}`;
         const ogAuthor = `yt:channel:UClxj3GlGphZVgd1SLYhZKmg`;
         const modified = injectMeta(html, {
           title: `${entry.title} — Kannaoke`,
@@ -88,7 +88,9 @@ export function injectMeta(html: string, meta: { title: string; description: str
     result = result.replace(/(<meta\s+property="og:image"\s+content=")[^"]*(")/i, `$1${escHtml(meta.ogImage)}$2`);
   }
   if (meta.videoUrl) {
-    result = result.replace(/(<meta\s+property="og:video"\s+content=")[^"]*(")/i, `$1${escHtml(meta.videoUrl)}$2`);
+    result += `<meta property="og:type" content="video.other" />`;
+    result += `<meta property="og:video:url" content="${escHtml(meta.videoUrl)}" />`;
+    result += `<meta property="og:video:secure_url" content="${escHtml(meta.videoUrl)}" />`;
     result += `<meta property="og:video:type" content="text/html" />`;
     result += `<meta property="og:video:width" content="1280" />`;
     result += `<meta property="og:video:height" content="720" />`;
