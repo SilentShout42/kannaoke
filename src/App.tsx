@@ -177,12 +177,12 @@ export default function App() {
       const tParam = urlParams.get('t');
       const qParam = urlParams.get('q')?.trim() ?? '';
       const playParam = urlParams.get('autoplay') === '1';
-      const matched = vParam && tParam
+      const matched = vParam
         ? data
           .filter(p => p.videoId === vParam)
           .reduce<Performance | undefined>((best, p) => {
             if (!best) return p;
-            return Math.abs(p.startTime - Number(tParam)) < Math.abs(best.startTime - Number(tParam)) ? p : best;
+            return Math.abs(p.startTime - Number(tParam ?? 0)) < Math.abs(best.startTime - Number(tParam ?? 0)) ? p : best;
           }, undefined)
         : undefined;
 
