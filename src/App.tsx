@@ -74,9 +74,9 @@ export default function App() {
   const scrollWrapRef = useRef<HTMLDivElement | null>(null);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const performancesRef = useRef<Performance[]>([]);
+  const activeEntryRef = useRef<Performance | null>(null);
   const currentVideoIdRef = useRef<string | null>(null);
   const timeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const lastTimeRef = useRef<number | null>(null);
 
   const updateScrollFade = () => {
     const el = resultsRef.current;
@@ -96,22 +96,16 @@ export default function App() {
   const handleTimeUpdate = () => {
     const player = ytPlayerRef.current;
     if (!player) return;
+    const videoId = currentVideoIdRef.current;
+    if (!videoId) return;
     const now = player.getCurrentTime();
-    const prev = lastTimeRef.current;
-    if (prev != null && now > prev + 10) {
-      const videoId = currentVideoIdRef.current;
-      if (videoId) {
-        const entry = performancesRef.current
-          .filter(p => p.videoId === videoId && p.startTime <= now)
-          .sort((a, b) => b.startTime - a.startTime)[0];
-        if (entry && entry !== activeEntry) {
-          pushNextNav.current = false;
-          setActiveEntry(entry);
-          scrollActiveToSafeZone();
-        }
-      }
+    const entry = performancesRef.current
+      .filter(p => p.videoId === videoId && p.startTime <= now)
+      .sort((a, b) => b.startTime - a.startTime)[0];
+    if (entry && entry !== activeEntryRef.current) {
+      pushNextNav.current = false;
+      setActiveEntry(entry);
     }
-    lastTimeRef.current = now;
   };
 
   const scrollActiveToSafeZone = () => {
@@ -245,10 +239,9 @@ export default function App() {
                 const { BUFFERING, CUED, PLAYING } = window.YT.PlayerState;
                 if ([BUFFERING, CUED].includes(data)) setRolling(false);
                 if (data === PLAYING) {
-                  clearTimeTimer();
-                  currentVideoIdRef.current = ytPlayerRef.current?.loadVideoById.toString().match(/\('([a-zA-Z0-9_-]{11})'\)/)?.[1] ?? performancesRef.current.find(p => p === activeEntry)?.videoId ?? null;
-                  lastTimeRef.current = ytPlayerRef.current?.getCurrentTime() ?? null;
-                  timeTimerRef.current = setInterval(handleTimeUpdate, 500);
+                  if (!timeTimerRef.current) {
+                    timeTimerRef.current = setInterval(handleTimeUpdate, 500);
+                  }
                 } else {
                   clearTimeTimer();
                 }
@@ -349,7 +342,10 @@ export default function App() {
     };
   }, []);
 
-  useEffect(() => { scrollActiveToSafeZone(); }, [activeEntry]);
+  useEffect(() => {
+    activeEntryRef.current = activeEntry;
+    scrollActiveToSafeZone();
+  }, [activeEntry]);
 
   useEffect(() => {
     document.title = activeEntry
@@ -425,9 +421,8 @@ export default function App() {
 
   function selectEntry(entry: Performance, play = true, push = true) {
     pushNextNav.current = push;
-    clearTimeTimer();
     currentVideoIdRef.current = entry.videoId;
-    lastTimeRef.current = null;
+    activeEntryRef.current = entry;
     if (LITE_PLAYER) {
       setAutoplay(play);
       setActiveEntry(entry);
