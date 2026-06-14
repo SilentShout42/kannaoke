@@ -33,6 +33,7 @@ interface YTPlayer {
   cueVideoById(params: { videoId: string; startSeconds: number; endSeconds?: number }): void;
   playVideo(): void;
   unMute(): void;
+  getCurrentTime(): number;
 }
 
 function videoParams(entry: Performance) {
@@ -72,6 +73,10 @@ export default function App() {
   const resultsRef = useRef<HTMLUListElement | null>(null);
   const scrollWrapRef = useRef<HTMLDivElement | null>(null);
   const scrollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const performancesRef = useRef<Performance[]>([]);
+  const currentVideoIdRef = useRef<string | null>(null);
+  const timeTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const lastTimeRef = useRef<number | null>(null);
 
   const updateScrollFade = () => {
     const el = resultsRef.current;
@@ -79,6 +84,34 @@ export default function App() {
     if (!el || !wrap) return;
     wrap.classList.toggle('has-top', el.scrollTop > 0);
     wrap.classList.toggle('has-bottom', el.scrollTop + el.clientHeight < el.scrollHeight - 1);
+  };
+
+  const clearTimeTimer = () => {
+    if (timeTimerRef.current) {
+      clearInterval(timeTimerRef.current);
+      timeTimerRef.current = null;
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    const player = ytPlayerRef.current;
+    if (!player) return;
+    const now = player.getCurrentTime();
+    const prev = lastTimeRef.current;
+    if (prev != null && now > prev + 10) {
+      const videoId = currentVideoIdRef.current;
+      if (videoId) {
+        const entry = performancesRef.current
+          .filter(p => p.videoId === videoId && p.startTime <= now)
+          .sort((a, b) => b.startTime - a.startTime)[0];
+        if (entry && entry !== activeEntry) {
+          pushNextNav.current = false;
+          setActiveEntry(entry);
+          scrollActiveToSafeZone();
+        }
+      }
+    }
+    lastTimeRef.current = now;
   };
 
   const scrollActiveToSafeZone = () => {
@@ -138,6 +171,7 @@ export default function App() {
       if (cancelled) return;
 
       setPerformances(data);
+      performancesRef.current = data;
 
       // Filter to public, non-cover videos for random selection
       const publicVideos = data.filter(p => !p.membersOnly && !/cover/i.test(p.videoTitle));
@@ -208,8 +242,16 @@ export default function App() {
                 }
               },
               onStateChange({ data }: { data: number }) {
-                const { BUFFERING, CUED } = window.YT.PlayerState;
+                const { BUFFERING, CUED, PLAYING } = window.YT.PlayerState;
                 if ([BUFFERING, CUED].includes(data)) setRolling(false);
+                if (data === PLAYING) {
+                  clearTimeTimer();
+                  currentVideoIdRef.current = ytPlayerRef.current?.loadVideoById.toString().match(/\('([a-zA-Z0-9_-]{11})'\)/)?.[1] ?? performancesRef.current.find(p => p === activeEntry)?.videoId ?? null;
+                  lastTimeRef.current = ytPlayerRef.current?.getCurrentTime() ?? null;
+                  timeTimerRef.current = setInterval(handleTimeUpdate, 500);
+                } else {
+                  clearTimeTimer();
+                }
               },
             },
           });
@@ -383,6 +425,9 @@ export default function App() {
 
   function selectEntry(entry: Performance, play = true, push = true) {
     pushNextNav.current = push;
+    clearTimeTimer();
+    currentVideoIdRef.current = entry.videoId;
+    lastTimeRef.current = null;
     if (LITE_PLAYER) {
       setAutoplay(play);
       setActiveEntry(entry);
