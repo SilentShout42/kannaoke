@@ -180,9 +180,10 @@ export default function App() {
       const matched = vParam
         ? data
           .filter(p => p.videoId === vParam)
+          .filter(p => p.startTime <= Number(tParam ?? 0))
           .reduce<Performance | undefined>((best, p) => {
             if (!best) return p;
-            return Math.abs(p.startTime - Number(tParam ?? 0)) < Math.abs(best.startTime - Number(tParam ?? 0)) ? p : best;
+            return p.startTime > best.startTime ? p : best;
           }, undefined)
         : undefined;
 
@@ -236,7 +237,7 @@ export default function App() {
                 }
               },
               onStateChange({ data }: { data: number }) {
-                const { BUFFERING, CUED, PLAYING } = window.YT.PlayerState;
+                const { BUFFERING, CUED, PAUSED, PLAYING } = window.YT.PlayerState;
                 if ([BUFFERING, CUED].includes(data)) setRolling(false);
                 if (data === PLAYING) {
                   if (!timeTimerRef.current) {
@@ -244,6 +245,7 @@ export default function App() {
                   }
                 } else {
                   clearTimeTimer();
+                  if (data === PAUSED) handleTimeUpdate();
                 }
               },
             },

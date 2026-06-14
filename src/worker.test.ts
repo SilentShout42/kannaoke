@@ -185,14 +185,14 @@ describe('worker fetch handler', () => {
     expect(assets.fetch).toHaveBeenCalledWith(req);
   });
 
-  it('treats missing t as t=0 and matches nearest entry', async () => {
+  it('treats missing t as t=0 and passes through (no song starts at t=0)', async () => {
     const assets = makeAssets();
     const req = makeRequest('/?v=q71H8SzQYFc', HUMAN_UA);
     const resp = await worker.fetch(req, { ASSETS: assets } as never);
     const html = await resp.text();
-    // nearest to t=0 among startTimes 500, 7175, 12000 is 500
-    expect(html).toContain('<title>Near Start — Kannaoke</title>');
-    expect(html).not.toContain('Default Title');
+    // lookback-only: no entry has startTime <= 0, so no match → pass through
+    expect(html).toContain('Default Title');
+    expect(html).not.toContain('Near Start');
   });
 
   it('matches exact startTime when provided', async () => {
@@ -203,31 +203,32 @@ describe('worker fetch handler', () => {
     expect(html).toContain('<title>Song of the Ancients — Kannaoke</title>');
   });
 
-  it('nearest-neighbor: snaps to the closer of two entries', async () => {
+  it('lookback: t between two entries picks the earlier one', async () => {
     const assets = makeAssets();
     const req = makeRequest('/?v=q71H8SzQYFc&t=3837', HUMAN_UA);
     const resp = await worker.fetch(req, { ASSETS: assets } as never);
     const html = await resp.text();
-    // 3837 is roughly midway between 500 (diff 3337) and 7175 (diff 3338)
-    // nearest is 500 (Near Start)
+    // lookback-only: entries <= 3837 are only 500 (Near Start)
     expect(html).toContain('<title>Near Start — Kannaoke</title>');
   });
 
-  it('nearest-neighbor: snaps to the later of two entries', async () => {
+  it('lookback: t between two entries never snaps forward', async () => {
     const assets = makeAssets();
     const req = makeRequest('/?v=q71H8SzQYFc&t=9600', HUMAN_UA);
     const resp = await worker.fetch(req, { ASSETS: assets } as never);
     const html = await resp.text();
-    // 9600 is closer to 12000 (diff 2400) than 7175 (diff 2425)
-    expect(html).toContain('<title>Mid Stream — Kannaoke</title>');
+    // lookback-only: entries <= 9600 are 500 and 7175; picks 7175 (Song of the Ancients)
+    // does NOT snap forward to 12000 (Mid Stream)
+    expect(html).toContain('<title>Song of the Ancients — Kannaoke</title>');
+    expect(html).not.toContain('Mid Stream');
   });
 
-  it('nearest-neighbor: extreme t beyond all entries picks the closest edge', async () => {
+  it('lookback: extreme t beyond all entries picks the last entry', async () => {
     const assets = makeAssets();
     const req = makeRequest('/?v=q71H8SzQYFc&t=50000', HUMAN_UA);
     const resp = await worker.fetch(req, { ASSETS: assets } as never);
     const html = await resp.text();
-    // 50000 is farthest from 12000 but that's still the nearest
+    // lookback-only: all entries (500, 7175, 12000) are <= 50000; picks 12000 (Mid Stream)
     expect(html).toContain('<title>Mid Stream — Kannaoke</title>');
   });
 

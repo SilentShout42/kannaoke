@@ -26,8 +26,9 @@ async function findEntry(env: Env, origin: string, videoId: string, startTime: n
     data = await resp.json();
     performancesCache.set(env.ASSETS, data!);
    }
-  return data!.filter((p) => p.videoId === videoId).sort((a, b) => a.startTime - b.startTime).reduce((best, cur) =>
-    Math.abs(cur.startTime - startTime) < Math.abs(best.startTime - startTime) ? cur : best, data![0]) ?? null;
+  const candidates = data!.filter((p) => p.videoId === videoId && p.startTime <= startTime);
+  if (candidates.length === 0) return null;
+  return candidates.reduce((best, cur) => cur.startTime > best.startTime ? cur : best);
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────────
