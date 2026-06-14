@@ -26,7 +26,8 @@ async function findEntry(env: Env, origin: string, videoId: string, startTime: n
     data = await resp.json();
     performancesCache.set(env.ASSETS, data!);
    }
-  return data!.find((p) => p.videoId === videoId && p.startTime === startTime) ?? null;
+  return data!.filter((p) => p.videoId === videoId).sort((a, b) => a.startTime - b.startTime).reduce((best, cur) =>
+    Math.abs(cur.startTime - startTime) < Math.abs(best.startTime - startTime) ? cur : best, data![0]) ?? null;
 }
 
 // ─── Export ───────────────────────────────────────────────────────────────────
@@ -36,8 +37,8 @@ export default {
     const url = new URL(request.url);
 
     const v = url.searchParams.get('v');
-    const t = url.searchParams.get('t');
-    if (v && t) {
+    const t = url.searchParams.get('t') ?? '0';
+    if (v) {
       const startTime = parseInt(t, 10);
       const entry = await findEntry(env, url.origin, v, startTime);
       console.log(JSON.stringify({ event: 'entry_lookup', v, t, found: !!entry, title: entry?.title }));
